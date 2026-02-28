@@ -1,19 +1,14 @@
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { GetObjectCommand } from "@aws-sdk/client-s3";
-import s3 from "./client";
+import { supabase, STORAGE_BUCKET } from "./client";
 
 const getPresignedUrl = async (path: string) => {
-  // Remove leading slash if present
   if (path[0] === "/") path = path.slice(1);
 
-  const getObjectParams = {
-    Bucket: process.env.AWS_BUCKET_NAME,
-    Key: path,
-  };
+  const { data, error } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .createSignedUrl(path, 3600);
 
-  const command = new GetObjectCommand(getObjectParams);
-  const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
-  return url;
+  if (error) throw new Error(`Failed to create signed URL: ${error.message}`);
+  return data.signedUrl;
 };
 
 export default getPresignedUrl;

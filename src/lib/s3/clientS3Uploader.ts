@@ -1,4 +1,4 @@
-export interface ClientS3UploaderOptions {
+export interface ClientStorageUploaderOptions {
   presignedRouteProvider: string;
 }
 
@@ -7,29 +7,23 @@ export interface UploadFileOptions {
   meta?: any;
 }
 
-export class ClientS3Uploader {
+export class ClientStorageUploader {
   private presignedRouteProvider: string;
 
-  constructor(options: ClientS3UploaderOptions) {
+  constructor(options: ClientStorageUploaderOptions) {
     this.presignedRouteProvider = options.presignedRouteProvider;
   }
 
   /**
-   * Uploads a file to S3 using presigned URL
-   * @param file - The file to upload
-   * @param options - Additional options including meta data
-   * @returns Promise<string> - The URL of the uploaded file
+   * Uploads a file to Supabase Storage using a signed upload URL
    */
   async uploadFile(file: File, options: UploadFileOptions = {}): Promise<string> {
     const { meta } = options;
 
     try {
-      // Get presigned URL and fields
       const createUploadUrlResponse = await fetch(this.presignedRouteProvider, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           fileName: file.name,
           fileType: file.type,
@@ -49,42 +43,26 @@ export class ClientS3Uploader {
         throw new Error("No upload URL received");
       }
 
-      // Create FormData for S3 upload
-      const formData = new FormData();
-      const fields = uploadData.fields || {};
-
-      // Add all fields from presigned post
-      for (const [key, value] of Object.entries(fields)) {
-        formData.append(key, value as string);
-      }
-
-      // Add the file last
-      formData.append("file", file);
-
-      // Upload to S3
+      // Upload directly to Supabase Storage signed URL
       const uploadResponse = await fetch(uploadData.url, {
-        method: "POST",
-        body: formData,
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
       });
 
       if (!uploadResponse.ok) {
         throw new Error(`Upload failed: ${uploadResponse.statusText}`);
       }
 
-      // Construct the file URL
-      const fileUrl = `${uploadData.url}${fields.key || file.name}`;
-      return fileUrl;
+      return uploadData.publicUrl || uploadData.url;
     } catch (error) {
-      console.error("S3 upload error:", error);
+      console.error("Storage upload error:", error);
       throw error;
     }
   }
 
   /**
-   * Uploads multiple files to S3 concurrently
-   * @param files - Array of files to upload
-   * @param options - Additional options including meta data
-   * @returns Promise<string[]> - Array of URLs of the uploaded files
+   * Uploads multiple files concurrently
    */
   async uploadFiles(files: File[], options: UploadFileOptions = {}): Promise<string[]> {
     const uploadPromises = files.map((file) => this.uploadFile(file, options));
@@ -92,7 +70,6 @@ export class ClientS3Uploader {
   }
 }
 
-// Export a default instance factory for convenience
-export const createS3Uploader = (presignedRouteProvider: string) => {
-  return new ClientS3Uploader({ presignedRouteProvider });
+export const createStorageUploader = (presignedRouteProvider: string) => {
+  return new ClientStorageUploader({ presignedRouteProvider });
 };

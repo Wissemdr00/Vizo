@@ -1,6 +1,5 @@
 import "server-only";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import s3 from "./client";
+import { supabase, STORAGE_BUCKET } from "./client";
 
 const uploadFromServer = async ({
   file,
@@ -11,25 +10,24 @@ const uploadFromServer = async ({
   path: string;
   contentType?: string;
 }) => {
-  // normalize path for web by remove all spaces and special characters don't remove the dot and slash
   const normalizedPath = path.replace(/[^a-zA-Z0-9.\/]/g, "");
 
-  // convert base64 string to buffer
   const buffer = Buffer.from(file, "base64");
-  const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
-    Key: normalizedPath,
-    Body: buffer,
-    ContentType: contentType || undefined,
-  };
-  const data = await s3.send(new PutObjectCommand(params));
 
-  if (!data) throw new Error("File not uploaded");
+  const { error } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .upload(normalizedPath, buffer, {
+      contentType: contentType || "application/octet-stream",
+      upsert: true,
+    });
 
-  const location =
-    `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/` +
-    normalizedPath;
-  return location;
+  if (error) throw new Error(`File not uploaded: ${error.message}`);
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(normalizedPath);
+
+  return publicUrl;
 };
 
 export default uploadFromServer;

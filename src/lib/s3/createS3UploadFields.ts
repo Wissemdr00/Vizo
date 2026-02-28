@@ -1,48 +1,28 @@
-import {
-  createPresignedPost,
-  PresignedPost,
-  PresignedPostOptions,
-} from "@aws-sdk/s3-presigned-post";
-import s3 from "./client";
+import { supabase, STORAGE_BUCKET } from "./client";
 
-const createS3UploadFields = async ({
+interface UploadFields {
+  url: string;
+  fields: Record<string, string>;
+}
+
+const createStorageUploadUrl = async ({
   path,
-  maxSize,
-  contentType,
 }: {
   path: string;
   maxSize?: number;
   contentType?: string;
-}): Promise<PresignedPost> => {
-  if (!process.env.AWS_BUCKET_NAME) {
-    throw new Error("AWS_BUCKET_NAME is not set");
-  }
+}): Promise<UploadFields> => {
+  const { data, error } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .createSignedUploadUrl(path);
 
-  const conditions: NonNullable<PresignedPostOptions["Conditions"]> = [];
+  if (error)
+    throw new Error(`Failed to create upload URL: ${error.message}`);
 
-  if (maxSize) {
-    conditions.push(["content-length-range", 0, maxSize]);
-  }
-
-  if (contentType) {
-    conditions.push(["starts-with", "$Content-Type", contentType]);
-  }
-
-  const params: PresignedPostOptions = {
-    Bucket: process.env.AWS_BUCKET_NAME,
-    Key: path,
-    Conditions: conditions,
-    Fields: contentType
-      ? {
-          "Content-Type": contentType,
-        }
-      : {},
-    Expires: 3600,
+  return {
+    url: data.signedUrl,
+    fields: { token: data.token, path: data.path },
   };
-
-  const result = await createPresignedPost(s3, params);
-
-  return result;
 };
 
-export default createS3UploadFields;
+export default createStorageUploadUrl;
