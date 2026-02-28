@@ -1,5 +1,6 @@
 import withAuthRequired from "@/lib/auth/withAuthRequired";
-import createS3UploadFields from "@/lib/s3/createS3UploadFields";
+import createStorageUploadUrl from "@/lib/s3/createS3UploadFields";
+import { supabase, STORAGE_BUCKET } from "@/lib/s3/client";
 import { NextResponse } from "next/server";
 
 interface UploadAvatarRequest {
@@ -15,21 +16,18 @@ export const POST = withAuthRequired(async (req, context) => {
       await req.json();
 
     if (
-      !process.env.AWS_BUCKET_NAME ||
-      !process.env.AWS_REGION ||
-      !process.env.AWS_ACCESS_KEY_ID ||
-      !process.env.AWS_SECRET_ACCESS_KEY
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.SUPABASE_SERVICE_ROLE_KEY
     ) {
       return NextResponse.json(
         {
           error:
-            "AWS_BUCKET_NAME, AWS_REGION, AWS_ACCESS_KEY_ID, or AWS_SECRET_ACCESS_KEY is not set",
+            "NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set",
         },
         { status: 500 }
       );
     }
 
-    // Validate input
     if (!fileName || !fileType || !fileSize) {
       return NextResponse.json(
         { error: "Missing required fields: fileName, fileType, fileSize" },
@@ -37,7 +35,6 @@ export const POST = withAuthRequired(async (req, context) => {
       );
     }
 
-    // Validate file type (only allow images for avatars)
     if (!fileType.startsWith("image/")) {
       return NextResponse.json(
         { error: "Only image files are allowed for avatars" },
@@ -45,7 +42,6 @@ export const POST = withAuthRequired(async (req, context) => {
       );
     }
 
-    // Validate file size (max 5MB for avatars)
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (fileSize > maxSize) {
       return NextResponse.json(
@@ -54,28 +50,27 @@ export const POST = withAuthRequired(async (req, context) => {
       );
     }
 
-    // Extract file extension
     const fileExtension = fileName.split(".").pop()?.toLowerCase() || "jpg";
-
-    // Generate UUID for filename
     const fileUuid = crypto.randomUUID();
+    const storagePath = `public/users/${session.user.id}/avatars/${fileUuid}.${fileExtension}`;
 
-    // Construct S3 path: /public/users/<user-id>/avatars/<filename-uuid>.format
-    const s3Path = `public/users/${session.user.id}/avatars/${fileUuid}.${fileExtension}`;
-
-    // Create presigned URL
-    const presignedPost = await createS3UploadFields({
-      path: s3Path,
+    const uploadData = await createStorageUploadUrl({
+      path: storagePath,
       maxSize: maxSize,
       contentType: fileType,
     });
 
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath);
+
     return NextResponse.json({
-      url: presignedPost.url,
-      fields: presignedPost.fields,
+      url: uploadData.url,
+      fields: uploadData.fields,
+      publicUrl,
     });
   } catch (error) {
-    console.error("Error creating presigned URL for avatar upload:", error);
+    console.error("Error creating upload URL for avatar:", error);
     return NextResponse.json(
       { error: "Failed to create upload URL" },
       { status: 500 }

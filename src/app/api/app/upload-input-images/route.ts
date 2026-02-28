@@ -1,5 +1,6 @@
 import withAuthRequired from "@/lib/auth/withAuthRequired";
-import createS3UploadFields from "@/lib/s3/createS3UploadFields";
+import createStorageUploadUrl from "@/lib/s3/createS3UploadFields";
+import { supabase, STORAGE_BUCKET } from "@/lib/s3/client";
 import { NextResponse } from "next/server";
 
 interface UploadImageRequest {
@@ -14,7 +15,6 @@ export const POST = withAuthRequired(async (req, context) => {
     const { fileName, fileType, fileSize }: UploadImageRequest =
       await req.json();
 
-    // Basic validation
     if (!fileName || !fileType || !fileSize) {
       return NextResponse.json(
         { error: "Missing required fields: fileName, fileType, fileSize" },
@@ -22,7 +22,6 @@ export const POST = withAuthRequired(async (req, context) => {
       );
     }
 
-    // Validate file type (only allow images)
     if (!fileType.startsWith("image/")) {
       return NextResponse.json(
         { error: "Only image files are allowed" },
@@ -30,28 +29,27 @@ export const POST = withAuthRequired(async (req, context) => {
       );
     }
 
-    // Extract file extension
     const fileExtension = fileName.split(".").pop()?.toLowerCase() || "jpg";
-
-    // Generate UUID for filename
     const fileUuid = crypto.randomUUID();
+    const storagePath = `public/users/${session.user.id}/images/${fileUuid}.${fileExtension}`;
 
-    // Construct S3 path: /public/users/<user-id>/images/<filename-uuid>.format
-    const s3Path = `public/users/${session.user.id}/images/${fileUuid}.${fileExtension}`;
-
-    // Create presigned URL
-    const presignedPost = await createS3UploadFields({
-      path: s3Path,
+    const uploadData = await createStorageUploadUrl({
+      path: storagePath,
       maxSize: fileSize,
       contentType: fileType,
     });
 
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath);
+
     return NextResponse.json({
-      url: presignedPost.url,
-      fields: presignedPost.fields,
+      url: uploadData.url,
+      fields: uploadData.fields,
+      publicUrl,
     });
   } catch (error) {
-    console.error("Error creating presigned URL for image upload:", error);
+    console.error("Error creating upload URL:", error);
     return NextResponse.json(
       { error: "Failed to create upload URL" },
       { status: 500 }

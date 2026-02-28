@@ -4,7 +4,7 @@ import React, { useCallback, useState, useMemo } from "react";
 import { toast } from "sonner";
 import { Upload, X, Loader2, Check, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ClientS3Uploader } from "@/lib/s3/clientS3Uploader";
+import { ClientStorageUploader } from "@/lib/s3/clientS3Uploader";
 import {
   FileUpload,
   FileUploadDropzone,
@@ -81,7 +81,7 @@ function S3Uploader({
   });
 
   const uploader = useMemo(
-    () => new ClientS3Uploader({ presignedRouteProvider }),
+    () => new ClientStorageUploader({ presignedRouteProvider }),
     [presignedRouteProvider]
   );
 
