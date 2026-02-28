@@ -1,7 +1,8 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import useCurrentPlan from "@/lib/users/useCurrentPlan";
 import useUser from "@/lib/users/useUser";
+import useWorkspaces from "@/lib/workspaces/useWorkspaces";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,6 +11,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -17,44 +30,56 @@ import {
   DatabaseIcon,
   MessageSquareIcon,
   BarChart3Icon,
-  UploadIcon,
-  LinkIcon,
   SparklesIcon,
+  Loader2,
+  FolderIcon,
 } from "lucide-react";
 import Link from "next/link";
 import useCredits from "@/lib/users/useCredits";
+import WorkspaceCard from "@/components/workspaces/workspace-card";
+import { toast } from "sonner";
 
 function AppHomepage() {
   const { currentPlan, isLoading: planLoading } = useCurrentPlan();
   const { credits, isLoading: creditsLoading } = useCredits();
   const { user, isLoading: userLoading } = useUser();
+  const { workspaces, isLoading: workspacesLoading, mutate } = useWorkspaces();
+
+  const [createOpen, setCreateOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newDescription, setNewDescription] = useState("");
 
   const firstName = user?.name?.split(" ")[0] ?? "there";
   const aiQueryCredits = (credits as Record<string, number> | null)?.ai_query ?? 0;
 
-  const quickActions = [
-    {
-      title: "Upload a File",
-      description: "CSV, Excel, JSON, or Parquet",
-      icon: UploadIcon,
-      href: "#",
-      variant: "default" as const,
-    },
-    {
-      title: "Connect a Database",
-      description: "PostgreSQL, MySQL, MongoDB…",
-      icon: DatabaseIcon,
-      href: "#",
-      variant: "outline" as const,
-    },
-    {
-      title: "Connect Cloud Source",
-      description: "Google Sheets, Airtable, Notion…",
-      icon: LinkIcon,
-      href: "#",
-      variant: "outline" as const,
-    },
-  ];
+  const handleCreateWorkspace = async () => {
+    if (!newName.trim()) return;
+    setCreating(true);
+    try {
+      const res = await fetch("/api/app/workspaces", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newName.trim(),
+          description: newDescription.trim() || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to create workspace");
+      }
+      toast.success("Workspace created");
+      setCreateOpen(false);
+      setNewName("");
+      setNewDescription("");
+      mutate();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to create workspace");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6 p-6 max-w-5xl mx-auto">
@@ -119,50 +144,132 @@ function AppHomepage() {
           <CardHeader className="pb-2">
             <CardDescription>Workspaces</CardDescription>
             <CardTitle className="text-2xl flex items-center gap-2">
-              <DatabaseIcon className="h-5 w-5 text-blue-500" />
-              0
+              {workspacesLoading ? (
+                <Skeleton className="h-8 w-16" />
+              ) : (
+                <>
+                  <FolderIcon className="h-5 w-5 text-blue-500" />
+                  {workspaces.length}
+                </>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Button variant="link" className="p-0 h-auto text-xs">
-              Create workspace →
-            </Button>
+            <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+              <DialogTrigger asChild>
+                <Button variant="link" className="p-0 h-auto text-xs">
+                  Create workspace →
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create Workspace</DialogTitle>
+                  <DialogDescription>
+                    Organize your data sources and analyses in a workspace.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex flex-col gap-4 py-4">
+                  <div>
+                    <Label htmlFor="ws-name">Name</Label>
+                    <Input
+                      id="ws-name"
+                      placeholder="My Workspace"
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleCreateWorkspace()}
+                      className="mt-2"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="ws-desc">Description (optional)</Label>
+                    <Textarea
+                      id="ws-desc"
+                      placeholder="What's this workspace for?"
+                      value={newDescription}
+                      onChange={(e) => setNewDescription(e.target.value)}
+                      className="mt-2"
+                      rows={3}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setCreateOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleCreateWorkspace}
+                    disabled={creating || !newName.trim()}
+                  >
+                    {creating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Create
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </CardContent>
         </Card>
       </div>
 
-      {/* Get Started */}
-      <Card className="border-dashed">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <PlusIcon className="h-5 w-5" />
-            Get started with Vizo
-          </CardTitle>
-          <CardDescription>
-            Connect your first data source to start chatting with your data.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 sm:grid-cols-3">
-            {quickActions.map((action) => (
-              <Button
-                key={action.title}
-                asChild
-                variant={action.variant}
-                className="h-auto flex-col gap-2 py-4"
-              >
-                <Link href={action.href}>
-                  <action.icon className="h-6 w-6" />
-                  <div className="text-center">
-                    <div className="font-medium text-sm">{action.title}</div>
-                    <div className="text-xs opacity-70">{action.description}</div>
-                  </div>
-                </Link>
-              </Button>
+      {/* Workspaces */}
+      {workspacesLoading ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-4 w-48 mt-1" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-4 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : workspaces.length > 0 ? (
+        <>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <FolderIcon className="h-5 w-5" />
+              Your Workspaces
+            </h2>
+            <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm">
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  New Workspace
+                </Button>
+              </DialogTrigger>
+            </Dialog>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {workspaces.map((ws) => (
+              <WorkspaceCard key={ws.id} workspace={ws} onUpdate={() => mutate()} />
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </>
+      ) : (
+        <Card className="border-dashed">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <PlusIcon className="h-5 w-5" />
+              Get started with Vizo
+            </CardTitle>
+            <CardDescription>
+              Create a workspace to organize your data sources and start analyzing.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  Create your first workspace
+                </Button>
+              </DialogTrigger>
+            </Dialog>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Recent Analyses Placeholder */}
       <Card>
@@ -177,12 +284,8 @@ function AppHomepage() {
           <div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
             <BarChart3Icon className="h-12 w-12 text-muted-foreground/40" />
             <p className="text-muted-foreground text-sm">
-              No analyses yet. Connect a data source to get started.
+              No analyses yet. Create a workspace and connect a data source to get started.
             </p>
-            <Button size="sm" variant="outline">
-              <PlusIcon className="mr-2 h-4 w-4" />
-              New Analysis
-            </Button>
           </div>
         </CardContent>
       </Card>
