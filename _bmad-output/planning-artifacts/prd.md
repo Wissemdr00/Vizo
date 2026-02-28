@@ -364,14 +364,23 @@ Core experience: Upload files or connect databases → ask AI questions → get 
 |---|---|---|---|
 | FR-5.1 | Users can create a new conversation within a workspace, optionally selecting specific data source(s) to focus the analysis | MVP | Journey 1 step 7 |
 | FR-5.2 | Users can type natural-language questions and receive AI-generated responses streamed token-by-token in < 2 seconds to first token | MVP | Journey 1 step 8 |
-| FR-5.3 | AI responses include: natural language explanation, generated code (SQL or Python), execution results (data table or scalar), and auto-suggested visualization when applicable | MVP | Journey 1 step 8 |
+| FR-5.3 | AI agent autonomously selects and chains tools (schema inspection, SQL execution, Python execution, charting, data profiling) to answer questions in 1–8 steps per user message. The agent decides which tools to call and in what order | MVP | Journey 1 step 8 |
 | FR-5.4 | Users can select their preferred AI provider (OpenAI GPT-4o or Anthropic Claude) per workspace via workspace settings | MVP | Innovation |
-| FR-5.5 | System builds AI context from: full data source schema(s), conversation history (last 20 messages), and workspace metadata | MVP | AI quality |
-| FR-5.6 | System deducts 1 `ai_query` credit per user message that triggers an AI response | MVP | Credits |
+| FR-5.5 | System builds AI agent context from: full data source schema(s), conversation history (last 20 messages), tool call history within current turn, previous tool results, and workspace metadata | MVP | AI quality |
+| FR-5.6 | System deducts 1 `ai_query` credit per user message that triggers an AI response. All tool calls within the agent loop for that message are included — users pay per question, not per tool call | MVP | Credits |
 | FR-5.7 | System displays a "You've used X of Y credits" indicator in the chat interface and blocks queries when credits are exhausted, with a link to purchase more | MVP | Credits |
 | FR-5.8 | Users can view full conversation history within a workspace, with conversations listed by title and last activity date | MVP | Journey 2 step 11 |
 | FR-5.9 | System auto-generates conversation titles from the first user message (AI-summarized to < 50 characters) | MVP | UX |
 | FR-5.10 | Users can rename or delete conversations | MVP | Workspace management |
+| FR-5.11 | AI agent self-corrects on tool errors — retries with modified approach up to 2 times before surfacing error to user with explanation of what was attempted | MVP | AI quality |
+| FR-5.12 | AI agent generates 3 contextual follow-up question suggestions after each response, displayed as clickable chips below the message | MVP | Engagement |
+| FR-5.13 | AI agent auto-profiles data sources on first query in a conversation if schema hasn't been inspected yet — discovers tables, columns, types, row counts, and sample values before answering | MVP | AI quality |
+| FR-5.14 | AI agent proactively analyzes new data sources on upload: identifies distributions, outliers, correlations, data quality issues, and suggests 3-5 key insights before user asks a question | MVP | Proactive intelligence |
+| FR-5.15 | AI agent suggests chart types based on data shape and query results. Suggestions appear as clickable options (e.g., "📊 Bar chart", "📈 Line trend", "🔵 Scatter plot") | MVP | UX intelligence |
+| FR-5.16 | System includes 5-7 pre-built Analysis Templates for common business domains: Ad Campaign Performance, Sales KPI, Financial Overview, E-commerce Analytics, User Analytics, Churn & Retention, Operations Metrics | MVP | Templates |
+| FR-5.17 | AI agent detects which template matches uploaded data via column name heuristics and suggests running it (e.g., "This looks like ad campaign data — want me to run the Ad Performance analysis?") | MVP | Template matching |
+| FR-5.18 | Templates generate multi-chart reports with KPI cards, trend charts, rankings, anomaly detection, and actionable business recommendations | MVP | Report generation |
+| FR-5.19 | Generated reports are saveable and viewable in a dedicated report view within the workspace. PDF export deferred to Growth v1.5 | MVP (save+view) / Growth (PDF) | Reports |
 
 ### FR-6: Code Generation & Execution
 
@@ -379,14 +388,14 @@ Core experience: Upload files or connect databases → ask AI questions → get 
 |---|---|---|---|
 | FR-6.1 | AI generates SQL queries for data retrieval questions against file-based and database data sources | MVP | Journey 1 step 8 |
 | FR-6.2 | AI generates Python code (pandas, numpy, sklearn, scipy) for statistical analysis, data transformation, and machine learning tasks | MVP | Journey 2 step 9 |
-| FR-6.3 | AI selects the appropriate language (SQL or Python) based on the question type. Statistical/ML questions → Python. Data retrieval/aggregation → SQL | MVP | AI quality |
+| FR-6.3 | AI agent selects SQL, Python, or both in sequence based on question complexity. May chain: SQL (retrieve data) → Python (statistical analysis) → chart (visualize). The agent decides autonomously — user never chooses language | MVP | AI quality |
 | FR-6.4 | Generated SQL is validated as read-only before execution: no INSERT, UPDATE, DELETE, DROP, ALTER, CREATE, TRUNCATE, or GRANT statements allowed | MVP | Domain: security |
 | FR-6.5 | Users can view the generated code in a syntax-highlighted, collapsible code block with a copy-to-clipboard button | MVP | Journey 2 step 5 |
 | FR-6.6 | Users can edit generated code in-place and click "Re-run" to execute the modified version | MVP | Journey 2 step 6 |
 | FR-6.7 | SQL execution for file-based data uses in-memory DuckDB: data loaded, query executed, instance destroyed | MVP | Domain: sandbox |
 | FR-6.8 | SQL execution for database data sources runs against the live connection with READ ONLY transaction mode, 30-second timeout, and 10,000 row limit | MVP | Domain: sandbox |
 | FR-6.9 | Python execution runs in Pyodide (WASM) with: no filesystem access, no network access, whitelisted packages, 30-second timeout, 256MB memory limit | MVP | Domain: sandbox |
-| FR-6.10 | System deducts 1 `code_execution` credit per code execution (SQL or Python) | MVP | Credits |
+| FR-6.10 | Code executions within an agent loop are bundled: 1 `code_execution` credit per user message that triggers any code execution, regardless of how many tool calls the agent makes. Users pay per question, not per tool call | MVP | Credits |
 | FR-6.11 | Execution results are displayed as: data tables (up to 10,000 rows with pagination), scalar values, or error messages with the specific error text | MVP | UX |
 
 ### FR-7: Visualization & Charts
@@ -523,10 +532,12 @@ Core experience: Upload files or connect databases → ask AI questions → get 
 
 ### Constraints
 - **Runtime:** Vercel serverless functions (10-second default timeout, 60-second max for Pro). Long-running analyses use Inngest background functions
-- **Database:** Single PostgreSQL instance (Neon) for application data. User databases connected as external read-only sources
-- **File storage:** AWS S3 for user-uploaded files. No server-side file system persistence
-- **AI providers:** OpenAI and Anthropic APIs. Both require API keys configured server-side. Users do not provide their own API keys
+- **Database:** Supabase PostgreSQL for application data. User databases connected as external read-only sources. Drizzle ORM for schema management
+- **File storage:** Supabase Storage (S3-compatible) for user-uploaded files. No server-side file system persistence
+- **AI architecture:** Agentic AI using Vercel AI SDK `streamText()` with 7 custom tools + `maxSteps: 8`. Agent autonomously chains tools to answer questions. NOT a simple prompt→response chatbot
+- **AI providers:** OpenAI and Anthropic APIs via Vercel AI SDK unified interface. Both require API keys configured server-side. Users do not provide their own API keys
 - **Python execution:** Pyodide (WASM) runs client-side or in a Vercel Edge function. Not server-side Node.js
+- **Authentication:** NextAuth v5 (kept from Indie Kit — deeply integrated). Supabase Auth NOT used
 
 ### Assumptions
 - Users have access to at least one data source (file or database) to derive value from the product
