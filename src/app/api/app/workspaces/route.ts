@@ -1,8 +1,7 @@
 import withAuthRequired from "@/lib/auth/withAuthRequired";
 import { db } from "@/db";
 import { workspaces } from "@/db/schema/workspaces";
-import { dataSources } from "@/db/schema/data-sources";
-import { conversations } from "@/db/schema/conversations";
+import { defaultQuotas } from "@/db/schema/plans";
 import { createWorkspaceSchema } from "@/lib/validations/workspace.schema";
 import { eq, sql, desc } from "drizzle-orm";
 import { NextResponse } from "next/server";
@@ -28,7 +27,7 @@ export const GET = withAuthRequired(async (req, context) => {
 });
 
 export const POST = withAuthRequired(async (req, context) => {
-  const { session } = context;
+  const { session, getCurrentPlan } = context;
   const body = await req.json();
 
   const validation = createWorkspaceSchema.safeParse(body);
@@ -36,6 +35,26 @@ export const POST = withAuthRequired(async (req, context) => {
     return NextResponse.json(
       { error: "Validation failed", details: validation.error.issues },
       { status: 400 }
+    );
+  }
+
+  // Enforce maxWorkspaces quota (FR-2.4)
+  const plan = await getCurrentPlan();
+  const maxWorkspaces = plan?.quotas?.maxWorkspaces ?? defaultQuotas.maxWorkspaces;
+
+  const [{ count }] = await db
+    .select({ count: sql<number>`COUNT(*)` })
+    .from(workspaces)
+    .where(eq(workspaces.userId, session.user.id));
+
+  if (Number(count) >= maxWorkspaces) {
+    return NextResponse.json(
+      {
+        error: `Workspace limit reached (${maxWorkspaces}). Upgrade your plan for more workspaces.`,
+        code: "QUOTA_EXCEEDED",
+        upgradeUrl: "/app/plan",
+      },
+      { status: 403 }
     );
   }
 
