@@ -1,4 +1,4 @@
-export const TOOL_GUIDELINES = \`## Tool Usage Guidelines
+export const TOOL_GUIDELINES = `## Tool Usage Guidelines
 
 You have access to the following tools. Use them strategically:
 
@@ -59,4 +59,4 @@ You have access to the following tools. Use them strategically:
 - When multiple tools are needed, plan your sequence first
 - Return structured results, never raw errors to the user
 - When a question needs data, autonomously select SQL, Python, or both
-\`;
+`;
