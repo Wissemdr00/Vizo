@@ -1,0 +1,24 @@
+{
+  "id": "operations",
+  "name": "Operations Metrics",
+  "icon": "⚙️",
+  "description": "Analyze operational data: delivery times, quality metrics, efficiency, and resource utilization.",
+  "requiredColumns": [
+    { "name": "status", "aliases": ["state", "outcome", "result"], "type": "string" },
+    { "name": "duration", "aliases": ["time", "processing_time", "delivery_time", "lead_time"], "type": "number" },
+    { "name": "date", "aliases": ["created_at", "completed_at", "timestamp"], "type": "date" }
+  ],
+  "steps": [
+    { "tool": "inspect_schema", "description": "Understand operations data", "params": {} },
+    { "tool": "execute_sql", "description": "Calculate avg processing time, success rate", "params": {} },
+    { "tool": "render_chart", "description": "Processing time distribution", "params": { "chartType": "bar" } },
+    { "tool": "render_chart", "description": "Status breakdown", "params": { "chartType": "pie" } },
+    { "tool": "suggest_followups", "description": "Suggest analysis", "params": {} }
+  ],
+  "outputs": [
+    { "type": "kpi", "title": "Avg Processing Time" },
+    { "type": "kpi", "title": "Success Rate" },
+    { "type": "chart", "title": "Time Distribution" },
+    { "type": "recommendation", "title": "Efficiency Improvements" }
+  ]
+}

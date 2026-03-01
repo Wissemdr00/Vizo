@@ -1,0 +1,24 @@
+{
+  "id": "user_analytics",
+  "name": "User/Customer Analytics",
+  "icon": "👥",
+  "description": "Analyze user behavior: retention, cohorts, engagement metrics, and growth trends.",
+  "requiredColumns": [
+    { "name": "user_id", "aliases": ["customer_id", "id", "email"], "type": "string" },
+    { "name": "signup_date", "aliases": ["created_at", "registered_at", "join_date"], "type": "date" },
+    { "name": "activity_date", "aliases": ["last_active", "login_date", "event_date"], "type": "date" }
+  ],
+  "steps": [
+    { "tool": "inspect_schema", "description": "Understand user data", "params": {} },
+    { "tool": "execute_sql", "description": "Calculate total users, active users, retention", "params": {} },
+    { "tool": "render_chart", "description": "Signups over time", "params": { "chartType": "line" } },
+    { "tool": "render_chart", "description": "User segments", "params": { "chartType": "bar" } },
+    { "tool": "suggest_followups", "description": "Suggest analysis", "params": {} }
+  ],
+  "outputs": [
+    { "type": "kpi", "title": "Total Users" },
+    { "type": "kpi", "title": "Active Users (30d)" },
+    { "type": "chart", "title": "Growth Trend" },
+    { "type": "insight", "title": "Retention Analysis" }
+  ]
+}

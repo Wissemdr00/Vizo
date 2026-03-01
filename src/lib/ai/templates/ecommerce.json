@@ -1,0 +1,25 @@
+{
+  "id": "ecommerce",
+  "name": "E-commerce Analytics",
+  "icon": "🛒",
+  "description": "Analyze e-commerce metrics: conversion rate, AOV, LTV, cart abandonment, and product performance.",
+  "requiredColumns": [
+    { "name": "order_id", "aliases": ["transaction_id", "id"], "type": "string" },
+    { "name": "revenue", "aliases": ["total", "amount", "price"], "type": "number" },
+    { "name": "customer", "aliases": ["customer_id", "user_id", "email"], "type": "string" },
+    { "name": "product", "aliases": ["product_name", "item", "sku"], "type": "string" }
+  ],
+  "steps": [
+    { "tool": "inspect_schema", "description": "Understand e-commerce data", "params": {} },
+    { "tool": "execute_sql", "description": "Calculate AOV, orders per customer, top products", "params": {} },
+    { "tool": "render_chart", "description": "Revenue by product", "params": { "chartType": "bar" } },
+    { "tool": "render_chart", "description": "Order distribution", "params": { "chartType": "pie" } },
+    { "tool": "suggest_followups", "description": "Suggest analysis", "params": {} }
+  ],
+  "outputs": [
+    { "type": "kpi", "title": "Total Orders" },
+    { "type": "kpi", "title": "Average Order Value" },
+    { "type": "chart", "title": "Top Products" },
+    { "type": "recommendation", "title": "Revenue Optimization" }
+  ]
+}

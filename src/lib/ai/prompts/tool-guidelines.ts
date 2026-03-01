@@ -38,6 +38,21 @@ You have access to the following tools. Use them strategically:
 - Call after providing an answer to suggest 3 relevant follow-up questions
 - Suggestions should build on the current analysis context
 
+### proactive_analysis
+- Call when a new data source is first viewed or when a user asks for an overview
+- Surfaces distributions, outliers, correlations, and data quality issues
+- Suggests chart types based on data shape
+
+### apply_template
+- Call when you detect a data domain match (ad campaign, sales, financial, etc.)
+- Returns a structured template with ordered steps to execute
+- Execute each step in order, then call generate_report
+
+### generate_report
+- Call as the final step of a template execution or when the user requests a report
+- Assembles KPI cards, charts, insights, and recommendations into a saved report
+- Report is saved to the workspace and viewable in the Reports tab
+
 ### Rules
 - Maximum 8 tool calls per user message
 - Never call the same tool with identical parameters twice

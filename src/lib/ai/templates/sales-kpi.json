@@ -1,0 +1,26 @@
+{
+  "id": "sales_kpi",
+  "name": "Sales KPI Dashboard",
+  "icon": "📈",
+  "description": "Analyze sales performance: revenue, units sold, average order value, growth trends, and top products.",
+  "requiredColumns": [
+    { "name": "revenue", "aliases": ["sales", "amount", "total", "price"], "type": "number" },
+    { "name": "date", "aliases": ["order_date", "created_at", "transaction_date"], "type": "date" },
+    { "name": "product", "aliases": ["product_name", "item", "sku"], "type": "string" },
+    { "name": "quantity", "aliases": ["units", "qty", "count"], "type": "number" }
+  ],
+  "steps": [
+    { "tool": "inspect_schema", "description": "Understand data structure", "params": {} },
+    { "tool": "execute_sql", "description": "Calculate total revenue, AOV, units sold", "params": {} },
+    { "tool": "render_chart", "description": "Revenue over time", "params": { "chartType": "line" } },
+    { "tool": "render_chart", "description": "Top products by revenue", "params": { "chartType": "bar" } },
+    { "tool": "suggest_followups", "description": "Suggest deeper analysis", "params": {} }
+  ],
+  "outputs": [
+    { "type": "kpi", "title": "Total Revenue" },
+    { "type": "kpi", "title": "Average Order Value" },
+    { "type": "chart", "title": "Revenue Trend" },
+    { "type": "chart", "title": "Top Products" },
+    { "type": "recommendation", "title": "Growth Opportunities" }
+  ]
+}

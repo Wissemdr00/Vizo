@@ -1,0 +1,30 @@
+{
+  "id": "ad_campaign",
+  "name": "Ad Campaign Performance",
+  "icon": "📊",
+  "description": "Analyze ad campaign metrics: spend, impressions, clicks, conversions, ROAS, and CPA across campaigns.",
+  "requiredColumns": [
+    { "name": "campaign", "aliases": ["campaign_name", "ad_group", "adset"], "type": "string" },
+    { "name": "spend", "aliases": ["cost", "amount_spent", "budget"], "type": "number" },
+    { "name": "impressions", "aliases": ["impr", "views"], "type": "number" },
+    { "name": "clicks", "aliases": ["link_clicks"], "type": "number" },
+    { "name": "conversions", "aliases": ["results", "purchases", "leads"], "type": "number" }
+  ],
+  "steps": [
+    { "tool": "inspect_schema", "description": "Understand the data structure", "params": {} },
+    { "tool": "execute_sql", "description": "Calculate KPIs: total spend, CTR, CPC, CPA, ROAS", "params": {} },
+    { "tool": "render_chart", "description": "Spend by campaign (bar chart)", "params": { "chartType": "bar" } },
+    { "tool": "render_chart", "description": "CTR trend over time (line chart)", "params": { "chartType": "line" } },
+    { "tool": "execute_sql", "description": "Top and bottom performing campaigns", "params": {} },
+    { "tool": "suggest_followups", "description": "Suggest next analysis steps", "params": {} }
+  ],
+  "outputs": [
+    { "type": "kpi", "title": "Total Spend" },
+    { "type": "kpi", "title": "Average CTR" },
+    { "type": "kpi", "title": "Average CPA" },
+    { "type": "chart", "title": "Spend by Campaign" },
+    { "type": "chart", "title": "Performance Trend" },
+    { "type": "insight", "title": "Top Performers" },
+    { "type": "recommendation", "title": "Optimization Suggestions" }
+  ]
+}

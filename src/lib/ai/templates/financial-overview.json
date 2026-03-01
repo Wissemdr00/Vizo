@@ -1,0 +1,25 @@
+{
+  "id": "financial",
+  "name": "Financial Overview",
+  "icon": "💰",
+  "description": "Analyze financial data: P&L breakdown, expense categories, margins, and budget vs actual.",
+  "requiredColumns": [
+    { "name": "amount", "aliases": ["value", "total", "revenue", "expense"], "type": "number" },
+    { "name": "category", "aliases": ["type", "account", "department", "expense_type"], "type": "string" },
+    { "name": "date", "aliases": ["period", "month", "quarter"], "type": "date" }
+  ],
+  "steps": [
+    { "tool": "inspect_schema", "description": "Understand financial data structure", "params": {} },
+    { "tool": "execute_sql", "description": "Calculate totals by category", "params": {} },
+    { "tool": "render_chart", "description": "Expense breakdown", "params": { "chartType": "pie" } },
+    { "tool": "render_chart", "description": "Monthly trend", "params": { "chartType": "line" } },
+    { "tool": "suggest_followups", "description": "Suggest deeper analysis", "params": {} }
+  ],
+  "outputs": [
+    { "type": "kpi", "title": "Total Revenue" },
+    { "type": "kpi", "title": "Total Expenses" },
+    { "type": "kpi", "title": "Net Margin" },
+    { "type": "chart", "title": "Expense Breakdown" },
+    { "type": "chart", "title": "Monthly Trend" }
+  ]
+}

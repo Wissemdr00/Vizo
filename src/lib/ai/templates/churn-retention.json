@@ -1,0 +1,24 @@
+{
+  "id": "churn",
+  "name": "Churn & Retention Analysis",
+  "icon": "📉",
+  "description": "Analyze customer churn: churn rate, retention curves, at-risk segments, and win-back opportunities.",
+  "requiredColumns": [
+    { "name": "customer_id", "aliases": ["user_id", "id", "account_id"], "type": "string" },
+    { "name": "status", "aliases": ["state", "active", "churned", "subscription_status"], "type": "string" },
+    { "name": "date", "aliases": ["cancel_date", "churn_date", "last_active"], "type": "date" }
+  ],
+  "steps": [
+    { "tool": "inspect_schema", "description": "Understand churn data", "params": {} },
+    { "tool": "execute_sql", "description": "Calculate churn rate, retention by cohort", "params": {} },
+    { "tool": "render_chart", "description": "Churn over time", "params": { "chartType": "line" } },
+    { "tool": "render_chart", "description": "Status distribution", "params": { "chartType": "pie" } },
+    { "tool": "suggest_followups", "description": "Suggest analysis", "params": {} }
+  ],
+  "outputs": [
+    { "type": "kpi", "title": "Churn Rate" },
+    { "type": "kpi", "title": "Retention Rate" },
+    { "type": "chart", "title": "Churn Trend" },
+    { "type": "recommendation", "title": "Retention Strategy" }
+  ]
+}

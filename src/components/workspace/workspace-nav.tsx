@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Database, MessageSquare, BarChart3, Settings } from "lucide-react";
+import { Database, MessageSquare, BarChart3, FileText, Settings } from "lucide-react";
 
 const tabs = [
   { href: "sources", label: "Sources", icon: Database },
   { href: "chat", label: "Chat", icon: MessageSquare },
   { href: "gallery", label: "Gallery", icon: BarChart3 },
+  { href: "reports", label: "Reports", icon: FileText },
   { href: "settings", label: "Settings", icon: Settings },
 ];
 
@@ -19,7 +20,7 @@ export default function WorkspaceNav() {
   return (
     <nav className="flex gap-1 border-b px-4">
       {tabs.map((tab) => {
-        const href = `/app/workspace/${id}/${tab.href}`;
+        const href = "/app/workspace/" + id + "/" + tab.href;
         const isActive = pathname.includes(tab.href);
         const Icon = tab.icon;
         return (
