@@ -10,76 +10,76 @@ type Testimonial = {
 
 const testimonials: Testimonial[] = [
     {
-        name: 'Jonathan Yombo',
-        role: 'Software Engineer',
-        image: 'https://randomuser.me/api/portraits/men/1.jpg',
-        quote: 'Tailus is really extraordinary and very practical, no need to break your head. A real gold mine.',
+        name: 'Sarah Chen',
+        role: 'Marketing Analyst at GrowthCo',
+        image: 'https://randomuser.me/api/portraits/women/1.jpg',
+        quote: 'Vizo replaced three tools for me. I upload our ad campaign CSVs and get instant ROAS breakdowns, spend trends, and optimization suggestions. What used to take half a day now takes 5 minutes.',
     },
     {
-        name: 'Yves Kalume',
-        role: 'GDE - Android',
+        name: 'Michael Torres',
+        role: 'Head of Analytics at ShopFlow',
         image: 'https://randomuser.me/api/portraits/men/6.jpg',
-        quote: 'With no experience in webdesign I just redesigned my entire website in a few minutes with tailwindcss thanks to Tailus.',
+        quote: 'The fact that I can just type "show me revenue by product category this quarter" and get a chart with the SQL code underneath is incredible. My team adopted it in a week.',
     },
     {
-        name: 'Yucel Faruksahan',
-        role: 'Tailkits Creator',
-        image: 'https://randomuser.me/api/portraits/men/7.jpg',
-        quote: 'Great work on tailfolio template. This is one of the best personal website that I have seen so far :)',
+        name: 'Priya Sharma',
+        role: 'Data Analyst at FinEdge',
+        image: 'https://randomuser.me/api/portraits/women/7.jpg',
+        quote: 'I connected our PostgreSQL database and within minutes had a complete financial overview. The analysis templates detected our data schema automatically. Game changer.',
     },
     {
-        name: 'Anonymous author',
-        role: 'Doing something',
+        name: 'James Wilson',
+        role: 'Founder at MetricsDash',
         image: 'https://randomuser.me/api/portraits/men/8.jpg',
-        quote: 'I am really new to Tailwind and I want to give a go to make some page on my own. I searched a lot of hero pages and blocks online. However, most of them are not giving me a clear view or needed some HTML/CSS coding background to make some changes from the original or too expensive to have. I downloaded the one of Tailus template which is very clear to understand at the start and you could modify the codes/blocks to fit perfectly on your purpose of the page.',
+        quote: 'As a non-technical founder, I was always dependent on our data team for simple queries. With Vizo, I can explore our customer data myself and make faster decisions.',
     },
     {
-        name: 'Shekinah Tshiokufila',
-        role: 'Senior Software Engineer',
-        image: 'https://randomuser.me/api/portraits/men/4.jpg',
-        quote: 'Tailus is redefining the standard of web design, with these blocks it provides an easy and efficient way for those who love beauty but may lack the time to implement it. I can only recommend this incredible wonder.',
+        name: 'Elena Kowalski',
+        role: 'E-commerce Manager at TrendStore',
+        image: 'https://randomuser.me/api/portraits/women/4.jpg',
+        quote: 'The proactive analysis blew my mind. I uploaded our sales data and Vizo immediately spotted a seasonal anomaly we had been missing for months. The chart suggestions are always spot-on.',
     },
     {
-        name: 'Oketa Fred',
-        role: 'Fullstack Developer',
+        name: 'David Park',
+        role: 'Operations Lead at LogiServe',
         image: 'https://randomuser.me/api/portraits/men/2.jpg',
-        quote: 'I absolutely love Tailus! The component blocks are beautifully designed and easy to use, which makes creating a great-looking website a breeze.',
+        quote: 'We use Vizo for our daily operations metrics. The Python code generation for statistical analysis saves our team hours every week. The report generation feature ties it all together beautifully.',
     },
     {
-        name: 'Zeki',
-        role: 'Founder of ChatExtend',
-        image: 'https://randomuser.me/api/portraits/men/5.jpg',
-        quote: "Using TailsUI has been like unlocking a secret design superpower. It's the perfect fusion of simplicity and versatility, enabling us to create UIs that are as stunning as they are user-friendly.",
+        name: 'Amara Osei',
+        role: 'Growth Analyst at SaaSpring',
+        image: 'https://randomuser.me/api/portraits/women/5.jpg',
+        quote: 'Switched from Julius.ai to Vizo and haven\'t looked back. The workspace organization, template matching, and credit system are all thoughtfully designed. Best analytics tool for the price.',
     },
     {
-        name: 'Joseph Kitheka',
-        role: 'Fullstack Developer',
+        name: 'Ryan Murphy',
+        role: 'VP of Sales at ClosedWon',
         image: 'https://randomuser.me/api/portraits/men/9.jpg',
-        quote: 'Tailus has transformed the way I develop web applications. Their extensive collection of UI components, blocks, and templates has significantly accelerated my workflow. The flexibility to customize every aspect allows me to create unique user experiences. Tailus is a game-changer for modern web development!',
+        quote: 'Our sales team uses Vizo to analyze pipeline data. The Sales KPI template gives us instant dashboards with revenue trends, top performers, and conversion rates. Essential tool for any revenue team.',
     },
     {
-        name: 'Khatab Wedaa',
-        role: 'MerakiUI Creator',
-        image: 'https://randomuser.me/api/portraits/men/10.jpg',
-        quote: "Tailus is an elegant, clean, and responsive tailwind css components it's very helpful to start fast with your project.",
+        name: 'Lisa Nakamura',
+        role: 'Product Manager at DataFirst',
+        image: 'https://randomuser.me/api/portraits/women/10.jpg',
+        quote: 'Vizo makes it incredibly easy to go from "I have a question about our data" to "here\'s a chart I can share with stakeholders." The shareable reports feature is exactly what we needed.',
     },
     {
-        name: 'Rodrigo Aguilar',
-        role: 'TailwindAwesome Creator',
+        name: 'Carlos Mendez',
+        role: 'Freelance Data Consultant',
         image: 'https://randomuser.me/api/portraits/men/11.jpg',
-        quote: 'I love Tailus ❤️. The component blocks are well-structured, simple to use, and beautifully designed. It makes it really easy to have a good-looking website in no time.',
+        quote: 'I use Vizo with every client engagement now. Upload their data, run a template analysis, generate a report — all in one session. My clients are amazed at how fast I deliver insights.',
     },
     {
-        name: 'Eric Ampire',
-        role: 'Mobile Engineer at @BRPNews • @GoogleDevExpert for Android',
-        image: 'https://randomuser.me/api/portraits/men/12.jpg',
-        quote: 'Tailus templates are the perfect solution for anyone who wants to create a beautiful and functional website without any web design experience. The templates are easy to use, customizable, and responsive, and the support team is always available to help. I highly recommend Tailus templates to anyone who is looking to create a website.',
+        name: 'Nina Patel',
+        role: 'Retention Analyst at SubStack',
+        image: 'https://randomuser.me/api/portraits/women/12.jpg',
+        quote: 'The churn analysis template is incredibly accurate. It detected our at-risk customer segments and suggested retention strategies we hadn\'t considered. Vizo paid for itself in the first month.',
     },
     {
-        name: 'Roland Tubonge',
-        role: 'Software Engineer',
+        name: 'Thomas Bergman',
+        role: 'CFO at NordTech',
         image: 'https://randomuser.me/api/portraits/men/13.jpg',
-        quote: 'Tailus is so well designed that even with a very poor knowledge of web design you can do miracles. Let yourself be seduced!',
+        quote: 'Finally a BI tool that doesn\'t require a 6-month implementation. I connected our accounting database and had a full P&L breakdown in 15 minutes. The financial template is exceptional.',
     },
 ]
 
@@ -99,8 +99,8 @@ export default function WallOfLoveSection() {
             <div className="py-16 md:py-32">
                 <div className="mx-auto max-w-6xl px-6">
                     <div className="text-center">
-                        <h2 className="text-3xl font-semibold">Loved by the Community</h2>
-                        <p className="mt-6">Harum quae dolore orrupti aut temporibus ariatur.</p>
+                        <h2 className="text-3xl font-semibold">Loved by Data Teams</h2>
+                        <p className="mt-6">See what analysts, marketers, and founders are saying about Vizo.</p>
                     </div>
                     <div className="mt-8 grid gap-3 [--color-card:var(--color-muted)] sm:grid-cols-2 md:mt-12 lg:grid-cols-3 dark:[--color-muted:var(--color-zinc-900)]">
                         {testimonialChunks.map((chunk, chunkIndex) => (

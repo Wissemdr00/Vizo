@@ -5,28 +5,28 @@ export default function ContentSection() {
     return (
         <section className="py-16 md:py-32">
             <div className="mx-auto max-w-5xl space-y-8 px-6 md:space-y-16">
-                <h2 className="relative z-10 max-w-xl text-4xl font-medium lg:text-5xl">The Lyra ecosystem brings together our models.</h2>
+                <h2 className="relative z-10 max-w-xl text-4xl font-medium lg:text-5xl">From raw data to actionable insights in seconds.</h2>
                 <div className="relative">
                     <div className="relative z-10 space-y-4 md:w-1/2">
                         <p>
-                            Lyra is evolving to be more than just the models. <span className="font-medium">It supports an entire ecosystem</span> — from products innovate.
+                            Vizo turns your spreadsheets and databases into a conversation. <span className="font-medium">Ask questions in plain English</span> — get charts, code, and insights instantly.
                         </p>
-                        <p>It supports an entire ecosystem — from products to the APIs and platforms helping developers and businesses innovate</p>
+                        <p>Connect any data source, run SQL and Python analyses, and let AI detect patterns, outliers, and trends you might have missed.</p>
 
                         <div className="grid grid-cols-2 gap-3 pt-6 sm:gap-4">
                             <div className="space-y-3">
                                 <div className="flex items-center gap-2">
                                     <Zap className="size-4" />
-                                    <h3 className="text-sm font-medium">Faaast</h3>
+                                    <h3 className="text-sm font-medium">Instant Analysis</h3>
                                 </div>
-                                <p className="text-muted-foreground text-sm">It supports an entire helping developers and innovate.</p>
+                                <p className="text-muted-foreground text-sm">Upload a CSV and get key insights, distributions, and chart suggestions in under 10 seconds.</p>
                             </div>
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                     <Cpu className="size-4" />
-                                    <h3 className="text-sm font-medium">Powerful</h3>
+                                    <h3 className="text-sm font-medium">Smart Templates</h3>
                                 </div>
-                                <p className="text-muted-foreground text-sm">It supports an entire helping developers and businesses.</p>
+                                <p className="text-muted-foreground text-sm">7 pre-built analysis templates for ad campaigns, sales, finance, and more — detected automatically.</p>
                             </div>
                         </div>
                     </div>
