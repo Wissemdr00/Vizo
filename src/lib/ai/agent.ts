@@ -4,11 +4,17 @@ import { inspectSchemaTool } from "./tools/inspect-schema";
 import { profileDataTool } from "./tools/profile-data";
 import { analyzeResultsTool } from "./tools/analyze-results";
 import { suggestFollowupsTool } from "./tools/suggest-followups";
+import { executeSQLTool } from "./tools/execute-sql";
+import { executePythonTool } from "./tools/execute-python";
+import { renderChartTool } from "./tools/render-chart";
 
 export const MAX_STEPS = 8;
 
 export const agentTools = {
   inspect_schema: inspectSchemaTool,
+  execute_sql: executeSQLTool,
+  execute_python: executePythonTool,
+  render_chart: renderChartTool,
   profile_data: profileDataTool,
   analyze_results: analyzeResultsTool,
   suggest_followups: suggestFollowupsTool,

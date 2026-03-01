@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname, useParams } from "next/navigation";
 import { cn } from "@/lib/cn";
-import { Database, MessageSquare, Settings } from "lucide-react";
+import { Database, MessageSquare, BarChart3, Settings } from "lucide-react";
 
 const tabs = [
   { href: "sources", label: "Sources", icon: Database },
   { href: "chat", label: "Chat", icon: MessageSquare },
+  { href: "gallery", label: "Gallery", icon: BarChart3 },
   { href: "settings", label: "Settings", icon: Settings },
 ];
 
