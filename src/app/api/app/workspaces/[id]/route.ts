@@ -1,61 +1,77 @@
+import { NextResponse } from "next/server";
 import withAuthRequired from "@/lib/auth/withAuthRequired";
 import { db } from "@/db";
 import { workspaces } from "@/db/schema/workspaces";
-import { updateWorkspaceSchema } from "@/lib/validations/workspace.schema";
-import { eq, and } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { dataSources } from "@/db/schema/data-sources";
+import { eq, and, sql } from "drizzle-orm";
+import { z } from "zod";
 
-export const PATCH = withAuthRequired(async (req, context) => {
-  const { session, params } = context;
+const updateWorkspaceSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().max(500).optional(),
+  aiProvider: z.enum(["openai", "anthropic"]).optional(),
+});
+
+// GET — single workspace
+export const GET = withAuthRequired(async (req, { session, params }) => {
+  const { id } = (await params) as { id: string };
+
+  const [ws] = await db
+    .select()
+    .from(workspaces)
+    .where(and(eq(workspaces.id, id), eq(workspaces.userId, session.user.id)));
+
+  if (!ws) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  // Get data source count
+  const [{ count }] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(dataSources)
+    .where(eq(dataSources.workspaceId, id));
+
+  return NextResponse.json({ ...ws, dataSourceCount: count });
+});
+
+// PATCH — update workspace (name, description, aiProvider)
+export const PATCH = withAuthRequired(async (req, { session, params }) => {
   const { id } = (await params) as { id: string };
   const body = await req.json();
+  const parsed = updateWorkspaceSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+  }
 
-  const validation = updateWorkspaceSchema.safeParse(body);
-  if (!validation.success) {
-    return NextResponse.json(
-      { error: "Validation failed", details: validation.error.issues },
-      { status: 400 }
-    );
+  const [ws] = await db
+    .select({ id: workspaces.id })
+    .from(workspaces)
+    .where(and(eq(workspaces.id, id), eq(workspaces.userId, session.user.id)));
+  if (!ws) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   const [updated] = await db
     .update(workspaces)
-    .set({
-      ...validation.data,
-      updatedAt: new Date(),
-    })
-    .where(
-      and(eq(workspaces.id, id), eq(workspaces.userId, session.user.id))
-    )
+    .set({ ...parsed.data, updatedAt: new Date() })
+    .where(eq(workspaces.id, id))
     .returning();
 
-  if (!updated) {
-    return NextResponse.json(
-      { error: "Workspace not found" },
-      { status: 404 }
-    );
-  }
-
-  return NextResponse.json({ workspace: updated });
+  return NextResponse.json(updated);
 });
 
-export const DELETE = withAuthRequired(async (req, context) => {
-  const { session, params } = context;
+// DELETE — delete workspace (cascade)
+export const DELETE = withAuthRequired(async (req, { session, params }) => {
   const { id } = (await params) as { id: string };
 
-  const [deleted] = await db
-    .delete(workspaces)
-    .where(
-      and(eq(workspaces.id, id), eq(workspaces.userId, session.user.id))
-    )
-    .returning({ id: workspaces.id });
-
-  if (!deleted) {
-    return NextResponse.json(
-      { error: "Workspace not found" },
-      { status: 404 }
-    );
+  const [ws] = await db
+    .select({ id: workspaces.id })
+    .from(workspaces)
+    .where(and(eq(workspaces.id, id), eq(workspaces.userId, session.user.id)));
+  if (!ws) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
+  await db.delete(workspaces).where(eq(workspaces.id, id));
   return NextResponse.json({ success: true });
 });

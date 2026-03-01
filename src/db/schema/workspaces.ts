@@ -10,6 +10,7 @@ export const workspaces = pgTable("workspaces", {
     .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   description: text("description"),
+  aiProvider: text("aiProvider").$type<"openai" | "anthropic">().default("openai"),
   createdAt: timestamp("createdAt", { mode: "date" }).defaultNow(),
   updatedAt: timestamp("updatedAt", { mode: "date" }).defaultNow(),
 });
