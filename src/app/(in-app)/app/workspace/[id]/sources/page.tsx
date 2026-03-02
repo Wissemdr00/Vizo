@@ -358,7 +358,7 @@ function FileUploadForm({
 
       <Button
         onClick={handleUpload}
-        disabled={!file || uploading || (sheets && !selectedSheet)}
+        disabled={!file || uploading || !!(sheets && !selectedSheet)}
         className="w-full"
       >
         {uploading ? (

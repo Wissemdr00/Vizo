@@ -103,7 +103,7 @@ export default function ReportsPage() {
                     <CardTitle className="text-base">{report.title as string}</CardTitle>
                     <CardDescription className="flex items-center gap-2 mt-1">
                       <Badge variant="secondary" className="text-xs">
-                        {templateLabels[report.template as string] || report.template}
+                        {templateLabels[report.template as string] || String(report.template)}
                       </Badge>
                       <span className="text-xs">
                         {new Date(report.createdAt as string).toLocaleDateString()}

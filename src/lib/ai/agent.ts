@@ -28,12 +28,12 @@ export const agentTools = {
 
 export function getAgentConfig(opts: {
   provider: "openai" | "anthropic";
-  schemas: { name: string; type: string; columns?: { name: string; type: string }[]; tables?: unknown[] }[];
+  schemas: { name: string; type: string; columns?: { name: string; type: string }[]; tables?: { name: string; columns: { name: string; type: string }[]; estimatedRowCount: number }[] }[];
   workspaceName: string;
   workspaceId?: string;
 }) {
   return {
-    model: getModel(opts.provider),
+    model: getModel(opts.provider) as unknown as Parameters<typeof import("ai").streamText>[0]["model"],
     system: buildSystemPrompt({
       schemas: opts.schemas,
       workspaceName: opts.workspaceName,

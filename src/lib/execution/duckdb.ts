@@ -65,7 +65,9 @@ export async function executeFileSQL(
   }
 
   try {
-    const duckdb = await import("duckdb");
+    // Use indirect require to prevent Turbopack from statically analyzing the duckdb native module
+    const requireDuckDB = new Function("return require('duckdb')") as () => typeof import("duckdb");
+    const duckdb = requireDuckDB();
     const dbInstance = new duckdb.Database(":memory:");
     const conn = dbInstance.connect();
 

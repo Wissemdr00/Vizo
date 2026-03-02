@@ -3,7 +3,7 @@ import { TOOL_GUIDELINES } from "./tool-guidelines";
 import { SAFETY_RULES } from "./safety-rules";
 
 interface SystemPromptArgs {
-  schemas: { name: string; type: string; columns?: { name: string; type: string }[]; tables?: unknown[] }[];
+  schemas: { name: string; type: string; columns?: { name: string; type: string }[]; tables?: { name: string; columns: { name: string; type: string }[]; estimatedRowCount: number }[] }[];
   workspaceName: string;
 }
 

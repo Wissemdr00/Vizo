@@ -66,9 +66,12 @@ export function PlanForm({
       onetimePriceAnchor: 0,
       onetimePaypalPlanId: "",
       quotas: {
-        permiumSupport: false,
-        monthlyImages: 0,
-        somethingElse: "",
+        monthlyAiQueries: 0,
+        maxDataSources: 0,
+        maxWorkspaces: 0,
+        maxFileUploadSizeMb: 0,
+        codeExecution: false,
+        prioritySupport: false,
       },
     },
   });
@@ -573,26 +576,10 @@ export function PlanForm({
           <div className="grid gap-4 md:grid-cols-3">
             <FormField
               control={form.control}
-              name="quotas.permiumSupport"
-              render={({ field }) => (
-                <FormItem className="flex items-center gap-2">
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormLabel className="mt-0!">Premium Support</FormLabel>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="quotas.monthlyImages"
+              name="quotas.monthlyAiQueries"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Number of Monthly Images</FormLabel>
+                  <FormLabel>Monthly AI Queries</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -604,16 +591,89 @@ export function PlanForm({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
-              name="quotas.somethingElse"
+              name="quotas.maxDataSources"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Something Else</FormLabel>
+                  <FormLabel>Max Data Sources</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      type="number"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="quotas.maxWorkspaces"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Max Workspaces</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="quotas.maxFileUploadSizeMb"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Max File Upload Size (MB)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      {...field}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="quotas.codeExecution"
+              render={({ field }) => (
+                <FormItem className="flex items-center gap-2">
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel className="mt-0!">Code Execution</FormLabel>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="quotas.prioritySupport"
+              render={({ field }) => (
+                <FormItem className="flex items-center gap-2">
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel className="mt-0!">Priority Support</FormLabel>
                 </FormItem>
               )}
             />

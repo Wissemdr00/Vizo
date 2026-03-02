@@ -3,6 +3,7 @@ import { createMDX } from "fumadocs-mdx/next";
 import { withSentry } from "@/lib/sentry/init";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ["duckdb"],
   images: {
     remotePatterns: [
       {

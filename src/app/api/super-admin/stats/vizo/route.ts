@@ -1,17 +1,16 @@
 import { NextResponse } from "next/server";
-import withSuperAdmin from "@/lib/auth/withSuperAdmin";
+import withSuperAdminAuthRequired from "@/lib/auth/withSuperAdminAuthRequired";
 import { db } from "@/db";
 import { workspaces } from "@/db/schema/workspaces";
 import { conversations } from "@/db/schema/conversations";
 import { messages } from "@/db/schema/messages";
 import { dataSources } from "@/db/schema/data-sources";
 import { reports } from "@/db/schema/reports";
-import { users } from "@/db/schema/users";
-import { subscriptions } from "@/db/schema/subscriptions";
+import { users } from "@/db/schema/user";
 import { plans } from "@/db/schema/plans";
-import { sql, eq, gte, and } from "drizzle-orm";
+import { sql, eq, gte, and, isNotNull } from "drizzle-orm";
 
-export const GET = withSuperAdmin(async () => {
+export const GET = withSuperAdminAuthRequired(async () => {
   const now = new Date();
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -44,24 +43,33 @@ export const GET = withSuperAdmin(async () => {
       )
     );
 
-  // Active users (7 days) — users who have messages in last 7 days
+  // Active users (7 days) — users with workspace conversations updated recently
   const activeUsersResult = await db
-    .select({ count: sql<number>`count(distinct ${conversations.userId})` })
-    .from(conversations)
+    .select({ count: sql<number>`count(distinct ${workspaces.userId})` })
+    .from(workspaces)
+    .innerJoin(conversations, eq(conversations.workspaceId, workspaces.id))
     .innerJoin(messages, eq(messages.conversationId, conversations.id))
     .where(gte(messages.createdAt, sevenDaysAgo));
   const activeUsers7d = activeUsersResult[0]?.count || 0;
 
-  // MRR calculation (sum of active subscription plan prices / 12 for annual)
+  // MRR calculation: count users per plan, multiply by monthly price
   const mrrResult = await db
     .select({
-      totalMonthly: sql<number>`COALESCE(SUM(CASE WHEN ${plans.interval} = 'month' THEN ${plans.price} ELSE 0 END), 0)`,
-      totalAnnual: sql<number>`COALESCE(SUM(CASE WHEN ${plans.interval} = 'year' THEN ${plans.price} / 12 ELSE 0 END), 0)`,
+      monthlyPrice: plans.monthlyPrice,
+      yearlyPrice: plans.yearlyPrice,
+      userCount: sql<number>`count(*)`,
     })
-    .from(subscriptions)
-    .innerJoin(plans, eq(subscriptions.planId, plans.id))
-    .where(eq(subscriptions.status, "active"));
-  const mrr = ((mrrResult[0]?.totalMonthly || 0) + (mrrResult[0]?.totalAnnual || 0)) / 100;
+    .from(users)
+    .innerJoin(plans, eq(users.planId, plans.id))
+    .where(isNotNull(users.planId))
+    .groupBy(plans.id, plans.monthlyPrice, plans.yearlyPrice);
+
+  let mrr = 0;
+  for (const row of mrrResult) {
+    // Use monthly price if available, else yearly / 12
+    const price = row.monthlyPrice || (row.yearlyPrice ? Math.round(row.yearlyPrice / 12) : 0);
+    mrr += (price * row.userCount) / 100; // prices stored in cents
+  }
 
   // Top data source types
   const topSourceTypes = await db

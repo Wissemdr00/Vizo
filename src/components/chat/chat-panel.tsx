@@ -1,6 +1,6 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
+import { useChat } from "ai/react";
 import { useRef, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -47,7 +47,6 @@ export default function ChatPanel({
       toast.error(err.message || "Failed to get AI response");
     },
     onToolCall: async ({ toolCall }) => {
-      // Extract follow-up suggestions from tool calls
       if (toolCall.toolName === "suggest_followups") {
         const result = toolCall.args as { suggestions?: string[] };
         if (result?.suggestions) {

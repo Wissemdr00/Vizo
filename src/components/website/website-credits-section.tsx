@@ -192,38 +192,38 @@ export default function WebsiteCreditsSection() {
           </p>
         </div>
 
-        <Tabs defaultValue="image_generation" className="w-full">
+        <Tabs defaultValue="ai_query" className="w-full">
           <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-12">
             <TabsTrigger
-              value="image_generation"
+              value="ai_query"
               className="flex items-center gap-2"
             >
               <Image className="h-4 w-4" />
-              Image AI
+              AI Queries
             </TabsTrigger>
             <TabsTrigger
-              value="video_generation"
+              value="code_execution"
               className="flex items-center gap-2"
             >
               <Video className="h-4 w-4" />
-              Video AI
+              Code Execution
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="image_generation">
+          <TabsContent value="ai_query">
             <CreditTypeSection
-              creditType="image_generation"
-              title="Image Generation Credits"
-              description="Create stunning AI-generated images for your projects, marketing materials, and creative content."
+              creditType="ai_query"
+              title="AI Query Credits"
+              description="Ask questions about your data, generate insights, and get AI-powered analysis for your datasets."
               icon={Image}
             />
           </TabsContent>
 
-          <TabsContent value="video_generation">
+          <TabsContent value="code_execution">
             <CreditTypeSection
-              creditType="video_generation"
-              title="Video Generation Credits"
-              description="Generate engaging AI videos for social media, advertisements, and video content creation."
+              creditType="code_execution"
+              title="Code Execution Credits"
+              description="Run SQL and Python code against your data for advanced transformations, calculations, and custom analysis."
               icon={Video}
             />
           </TabsContent>
