@@ -44,6 +44,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import type { WorkspaceListItem } from "@/lib/workspaces/useWorkspaces";
 
 interface WorkspaceCardProps {
@@ -52,6 +53,7 @@ interface WorkspaceCardProps {
 }
 
 export default function WorkspaceCard({ workspace, onUpdate }: WorkspaceCardProps) {
+  const router = useRouter();
   const [renameOpen, setRenameOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [newName, setNewName] = useState(workspace.name);
@@ -100,7 +102,7 @@ export default function WorkspaceCard({ workspace, onUpdate }: WorkspaceCardProp
 
   return (
     <>
-      <Card className="group relative hover:shadow-md transition-shadow">
+      <Card className="group relative hover:shadow-md transition-shadow cursor-pointer" onClick={() => router.push(`/app/workspace/${workspace.id}`)}>
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
@@ -117,6 +119,7 @@ export default function WorkspaceCard({ workspace, onUpdate }: WorkspaceCardProp
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <MoreHorizontalIcon className="h-4 w-4" />
                 </Button>
