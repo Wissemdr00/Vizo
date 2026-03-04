@@ -1,87 +1,92 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Database, MessageSquare, BarChart3, Code2, Plug, Share2 } from 'lucide-react'
-import { ReactNode } from 'react'
 
 export default function Features() {
     return (
-        <section id="features" className="py-16 md:py-32">
-            <div className="@container mx-auto max-w-5xl px-6">
-                <div className="text-center">
-                    <h2 className="text-balance text-4xl font-semibold lg:text-5xl">Everything you need to analyze data</h2>
-                    <p className="mt-4 text-muted-foreground">Connect your data, ask questions, get instant insights — no SQL or Python knowledge required.</p>
+        <section id="features" className="py-32 px-6">
+            <div className="max-w-7xl mx-auto">
+                <div className="mb-20 text-center max-w-3xl mx-auto animate-fade-up">
+                    <h2 className="text-4xl md:text-5xl font-semibold text-white tracking-tight font-[family-name:var(--font-manrope)] mb-6">
+                        Everything You Need for <br />
+                        <span className="text-[#8B5CF6]">Data Intelligence</span>
+                    </h2>
+                    <p className="text-lg text-zinc-400 font-light">
+                        Connect your data, ask questions, get instant insights — no SQL or Python knowledge required.
+                    </p>
                 </div>
-                <div className="@min-4xl:max-w-full @min-4xl:grid-cols-3 mx-auto mt-8 grid max-w-sm gap-6 [--color-background:var(--color-muted)] [--color-card:var(--color-muted)] *:text-center md:mt-16 md:max-w-none md:grid-cols-3 dark:[--color-muted:var(--color-zinc-900)]">
-                    <Card className="group border-0 shadow-none">
-                        <CardHeader className="pb-3">
-                            <CardDecorator><Plug className="size-6" aria-hidden /></CardDecorator>
-                            <h3 className="mt-6 font-medium">15+ Data Connectors</h3>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm">Connect CSV, Excel, PostgreSQL, MySQL, MongoDB, Google Sheets, Airtable, BigQuery, Snowflake, REST APIs, and more.</p>
-                        </CardContent>
-                    </Card>
 
-                    <Card className="group border-0 shadow-none">
-                        <CardHeader className="pb-3">
-                            <CardDecorator><MessageSquare className="size-6" aria-hidden /></CardDecorator>
-                            <h3 className="mt-6 font-medium">Chat with Your Data</h3>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm">Ask questions in plain English. Vizo&apos;s AI understands your data schema and generates accurate answers instantly.</p>
-                        </CardContent>
-                    </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-auto lg:h-[700px]">
+                    {/* Main Feature Card */}
+                    <div className="lg:col-span-2 lg:row-span-2 group relative overflow-hidden p-8 border border-white/10 bg-gradient-to-b from-zinc-900/50 to-black hover:border-white/20 transition-all rounded-xl">
+                        <div className="relative z-10 h-full flex flex-col">
+                            <div className="mb-6 inline-flex p-3 rounded-lg bg-white/5 border border-white/10 text-[#8B5CF6] w-fit">
+                                <MessageSquare className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-3xl font-semibold text-white font-[family-name:var(--font-manrope)] mb-4 tracking-tight">Chat with Your Data</h3>
+                            <p className="text-zinc-400 text-lg leading-relaxed">Ask questions in plain English. Vizo&apos;s AI understands your data schema and generates accurate SQL, Python code, and visual charts instantly.</p>
+                            <div className="mt-auto flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+                                <span className="text-xs font-mono text-[#8B5CF6]">EXPLORE FEATURE</span>
+                            </div>
+                        </div>
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none" style={{ background: "radial-gradient(circle at top right, #8B5CF6, transparent 70%)" }}></div>
+                    </div>
 
-                    <Card className="group border-0 shadow-none">
-                        <CardHeader className="pb-3">
-                            <CardDecorator><BarChart3 className="size-6" aria-hidden /></CardDecorator>
-                            <h3 className="mt-6 font-medium">Auto-Generated Charts</h3>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm">Vizo automatically picks the best chart type for your data — bar, line, scatter, pie, heatmap, and more.</p>
-                        </CardContent>
-                    </Card>
+                    {/* Feature 2 */}
+                    <div className="lg:col-span-2 group relative overflow-hidden p-8 border border-white/10 bg-black hover:border-white/20 transition-all rounded-xl">
+                        <div className="relative z-10 flex flex-col h-full">
+                            <div className="mb-4 inline-flex p-3 rounded-lg bg-white/5 border border-white/10 text-blue-400 w-fit">
+                                <Plug className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-2xl font-semibold text-white font-[family-name:var(--font-manrope)] mb-2">15+ Data Connectors</h3>
+                            <p className="text-zinc-400">Connect CSV, Excel, PostgreSQL, MySQL, MongoDB, Google Sheets, BigQuery, Snowflake, REST APIs, and more.</p>
+                        </div>
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none" style={{ background: "radial-gradient(circle at top right, #3b82f6, transparent 70%)" }}></div>
+                    </div>
 
-                    <Card className="group border-0 shadow-none">
-                        <CardHeader className="pb-3">
-                            <CardDecorator><Code2 className="size-6" aria-hidden /></CardDecorator>
-                            <h3 className="mt-6 font-medium">SQL & Python Generation</h3>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm">Every answer comes with the SQL query or Python code that generated it. Edit and re-run with one click.</p>
-                        </CardContent>
-                    </Card>
+                    {/* Feature 3 */}
+                    <div className="group relative overflow-hidden p-8 border border-white/10 bg-black hover:border-white/20 transition-all rounded-xl">
+                        <div className="relative z-10">
+                            <div className="mb-4 inline-flex p-3 rounded-lg bg-white/5 border border-white/10 text-yellow-400 w-fit">
+                                <BarChart3 className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-xl font-semibold text-white font-[family-name:var(--font-manrope)] mb-2">Auto Charts</h3>
+                            <p className="text-sm text-zinc-400">AI picks the best chart type — bar, line, scatter, pie, heatmap — based on your data shape.</p>
+                        </div>
+                    </div>
 
-                    <Card className="group border-0 shadow-none">
-                        <CardHeader className="pb-3">
-                            <CardDecorator><Database className="size-6" aria-hidden /></CardDecorator>
-                            <h3 className="mt-6 font-medium">Workspaces & Projects</h3>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm">Organize your data sources and analyses into workspaces. Keep projects clean and context always available.</p>
-                        </CardContent>
-                    </Card>
+                    {/* Feature 4 */}
+                    <div className="group relative overflow-hidden p-8 border border-white/10 bg-black hover:border-white/20 transition-all rounded-xl">
+                        <div className="relative z-10">
+                            <div className="mb-4 inline-flex p-3 rounded-lg bg-white/5 border border-white/10 text-emerald-400 w-fit">
+                                <Code2 className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-xl font-semibold text-white font-[family-name:var(--font-manrope)] mb-2">SQL & Python</h3>
+                            <p className="text-sm text-zinc-400">Every answer comes with the code that generated it. Edit and re-run with one click.</p>
+                        </div>
+                    </div>
 
-                    <Card className="group border-0 shadow-none">
-                        <CardHeader className="pb-3">
-                            <CardDecorator><Share2 className="size-6" aria-hidden /></CardDecorator>
-                            <h3 className="mt-6 font-medium">Share & Collaborate</h3>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm">Share analysis links with teammates or stakeholders. Export charts and reports in one click.</p>
-                        </CardContent>
-                    </Card>
+                    {/* Feature 5 */}
+                    <div className="group relative overflow-hidden p-8 border border-white/10 bg-black hover:border-white/20 transition-all rounded-xl">
+                        <div className="relative z-10">
+                            <div className="mb-4 inline-flex p-3 rounded-lg bg-white/5 border border-white/10 text-pink-400 w-fit">
+                                <Database className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-xl font-semibold text-white font-[family-name:var(--font-manrope)] mb-2">Workspaces</h3>
+                            <p className="text-sm text-zinc-400">Organize data sources and analyses into projects. Keep context always available.</p>
+                        </div>
+                    </div>
+
+                    {/* Feature 6 */}
+                    <div className="group relative overflow-hidden p-8 border border-white/10 bg-black hover:border-white/20 transition-all rounded-xl">
+                        <div className="relative z-10">
+                            <div className="mb-4 inline-flex p-3 rounded-lg bg-white/5 border border-white/10 text-orange-400 w-fit">
+                                <Share2 className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-xl font-semibold text-white font-[family-name:var(--font-manrope)] mb-2">Share & Export</h3>
+                            <p className="text-sm text-zinc-400">Share analysis links with teammates. Export charts and reports in one click.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
     )
 }
-
-const CardDecorator = ({ children }: { children: ReactNode }) => (
-    <div className="mask-radial-from-40% mask-radial-to-60% relative mx-auto size-36 duration-200 [--color-border:color-mix(in_oklab,var(--color-zinc-950)10%,transparent)] group-hover:[--color-border:color-mix(in_oklab,var(--color-zinc-950)20%,transparent)] dark:[--color-border:color-mix(in_oklab,var(--color-white)15%,transparent)] dark:group-hover:[--color-border:color-mix(in_oklab,var(--color-white)20%,transparent)]">
-        <div
-            aria-hidden
-            className="absolute inset-0 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-[size:24px_24px] dark:opacity-50"
-        />
-        <div className="bg-background absolute inset-0 m-auto flex size-12 items-center justify-center border-l border-t">{children}</div>
-    </div>
-)

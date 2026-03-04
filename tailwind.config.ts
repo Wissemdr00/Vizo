@@ -4,8 +4,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        base: ["var(--font-public-sans)", "sans-serif"],
-        heading: ["var(--font-public-sans)", "sans-serif"],
+        base: ["var(--font-inter)", "sans-serif"],
+        heading: ["var(--font-manrope)", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",

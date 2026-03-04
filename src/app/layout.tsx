@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import { appConfig } from "@/lib/config";
 import Providers from "./Providers";
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
 });
 
@@ -38,7 +43,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/assets/logo.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
-      <body className={`${inter.variable} antialiased bg-background`}>
+      <body className={`${inter.variable} ${manrope.variable} antialiased bg-background`}>
         <Providers>{children}</Providers>
       </body>
     </html>
