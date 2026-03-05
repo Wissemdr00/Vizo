@@ -33,7 +33,7 @@ export function getAgentConfig(opts: {
   workspaceId?: string;
 }) {
   return {
-    model: getModel(opts.provider) as unknown as Parameters<typeof import("ai").streamText>[0]["model"],
+    model: getModel(opts.provider),
     system: buildSystemPrompt({
       schemas: opts.schemas,
       workspaceName: opts.workspaceName,

@@ -14,7 +14,7 @@ export function getModel(provider: "openai" | "anthropic" | "openrouter" = "open
       apiKey: process.env.OPENROUTER_API_KEY,
       baseURL: "https://openrouter.ai/api/v1",
     });
-    return openrouter("meta-llama/llama-3.3-70b-instruct:free");
+    return openrouter("arcee-ai/trinity-large-preview:free");
   }
 
   const openai = createOpenAI({
