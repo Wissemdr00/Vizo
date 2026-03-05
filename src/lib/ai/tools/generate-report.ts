@@ -1,4 +1,4 @@
-import { tool } from "ai";
+import { tool } from "../tool";
 import { z } from "zod";
 import { db } from "@/db";
 import { reports } from "@/db/schema/reports";
