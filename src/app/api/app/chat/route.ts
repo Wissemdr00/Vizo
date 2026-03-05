@@ -1,4 +1,5 @@
-import { streamText, type Message } from "ai";
+import { streamText, convertToModelMessages } from "ai";
+import type { UIMessage } from "@ai-sdk/react";
 import { getAgentConfig } from "@/lib/ai/agent";
 import { db } from "@/db";
 import { conversations } from "@/db/schema/conversations";
@@ -21,7 +22,7 @@ export async function POST(req: Request) {
   const userId = session.user.id;
   const body = await req.json();
   const { messages: chatMessages, conversationId, workspaceId } = body as {
-    messages: Message[];
+    messages: UIMessage[];
     conversationId: string;
     workspaceId: string;
   };
@@ -71,11 +72,18 @@ export async function POST(req: Request) {
 
   // Save user message
   const lastUserMsg = chatMessages[chatMessages.length - 1];
-  if (lastUserMsg?.role === "user") {
+  const lastUserText = lastUserMsg?.role === "user"
+    ? (lastUserMsg.parts
+        ?.filter((p) => p.type === "text")
+        .map((p) => (p as { type: "text"; text: string }).text)
+        .join("") ?? "")
+    : "";
+
+  if (lastUserMsg?.role === "user" && lastUserText) {
     await db.insert(messages).values({
       conversationId,
       role: "user",
-      content: lastUserMsg.content as string,
+      content: lastUserText,
     });
 
     // Auto-title from first message (FR-5.9)
@@ -84,10 +92,9 @@ export async function POST(req: Request) {
       .from(conversations)
       .where(eq(conversations.id, conversationId));
     if (conv?.title === "New Analysis") {
-      const autoTitle = (lastUserMsg.content as string).slice(0, 50);
       await db
         .update(conversations)
-        .set({ title: autoTitle, updatedAt: new Date() })
+        .set({ title: lastUserText.slice(0, 50), updatedAt: new Date() })
         .where(eq(conversations.id, conversationId));
     }
   }
@@ -98,7 +105,7 @@ export async function POST(req: Request) {
   // Stream AI response
   const result = streamText({
     ...config,
-    messages: chatMessages,
+    messages: await convertToModelMessages(chatMessages),
     onFinish: async ({ text }) => {
       // Save assistant message
       if (text) {
@@ -116,5 +123,5 @@ export async function POST(req: Request) {
     },
   });
 
-  return result.toDataStreamResponse();
+  return result.toUIMessageStreamResponse();
 }

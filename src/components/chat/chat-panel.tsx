@@ -1,15 +1,17 @@
 "use client";
 
-import { useChat } from "ai/react";
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import { useRef, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2, StopCircle } from "lucide-react";
+import { Send, StopCircle } from "lucide-react";
 import MessageBubble from "./message-bubble";
 import FollowupChips from "./followup-chips";
 import ToolCallIndicator from "./tool-call-indicator";
 import CreditCounter from "./credit-counter";
 import { toast } from "sonner";
+import type { UIMessage } from "@ai-sdk/react";
 
 interface ChatPanelProps {
   conversationId: string;
@@ -24,37 +26,43 @@ export default function ChatPanel({
 }: ChatPanelProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [input, setInput] = useState("");
   const [followups, setFollowups] = useState<string[]>([]);
 
-  const {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
-    stop,
-    error,
-    setInput,
-  } = useChat({
-    api: "/api/app/chat",
-    body: { conversationId, workspaceId },
-    initialMessages: initialMessages.map((m, i) => ({
+  const { messages, sendMessage, status, stop } = useChat({
+    transport: new DefaultChatTransport({
+      api: "/api/app/chat",
+      body: { conversationId, workspaceId },
+    }),
+    messages: initialMessages.map((m, i) => ({
       id: String(i),
-      role: m.role,
-      content: m.content,
-    })),
+      role: m.role as "user" | "assistant",
+      parts: [{ type: "text" as const, text: m.content }],
+      metadata: {},
+    })) as UIMessage[],
     onError: (err) => {
       toast.error(err.message || "Failed to get AI response");
     },
-    onToolCall: async ({ toolCall }) => {
-      if (toolCall.toolName === "suggest_followups") {
-        const result = toolCall.args as { suggestions?: string[] };
-        if (result?.suggestions) {
-          setFollowups(result.suggestions);
-        }
-      }
-    },
   });
+
+  const isLoading = status === "streaming" || status === "submitted";
+
+  // Extract followups from completed assistant messages
+  useEffect(() => {
+    if (status !== "ready") return;
+    const last = messages[messages.length - 1];
+    if (last?.role !== "assistant") return;
+    for (const part of last.parts ?? []) {
+      if (
+        part.type === "tool-invocation" &&
+        (part as { type: string; toolName?: string; state?: string; result?: { suggestions?: string[] } }).toolName === "suggest_followups" &&
+        (part as { type: string; state?: string }).state === "result"
+      ) {
+        const result = (part as { result?: { suggestions?: string[] } }).result;
+        if (result?.suggestions) setFollowups(result.suggestions);
+      }
+    }
+  }, [status, messages]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -63,24 +71,35 @@ export default function ChatPanel({
     }
   }, [messages]);
 
-  const handleFollowupSelect = (text: string) => {
-    setInput(text);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+    const text = input.trim();
+    setInput("");
     setFollowups([]);
-    // Auto-submit
-    setTimeout(() => {
-      inputRef.current?.form?.requestSubmit();
-    }, 50);
+    sendMessage({ text });
+  };
+
+  const handleFollowupSelect = (text: string) => {
+    setFollowups([]);
+    sendMessage({ text });
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      const form = inputRef.current?.form;
-      if (form && input.trim()) {
-        form.requestSubmit();
-        setFollowups([]);
+      if (input.trim() && !isLoading) {
+        handleSubmit(e as unknown as React.FormEvent);
       }
     }
+  };
+
+  // Helper: extract text content from a message
+  const getMessageText = (msg: UIMessage) => {
+    return (msg.parts ?? [])
+      .filter((p) => p.type === "text")
+      .map((p) => (p as { type: "text"; text: string }).text)
+      .join("");
   };
 
   return (
@@ -104,7 +123,7 @@ export default function ChatPanel({
           <MessageBubble
             key={message.id}
             role={message.role as "user" | "assistant"}
-            content={message.content}
+            content={getMessageText(message)}
             isStreaming={isLoading && message.id === messages[messages.length - 1]?.id && message.role === "assistant"}
           />
         ))}
@@ -115,15 +134,9 @@ export default function ChatPanel({
         )}
 
         {/* Follow-up suggestions */}
+
         {!isLoading && followups.length > 0 && (
           <FollowupChips suggestions={followups} onSelect={handleFollowupSelect} />
-        )}
-
-        {/* Error */}
-        {error && (
-          <div className="mx-4 my-2 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-            {error.message}
-          </div>
         )}
       </div>
 
@@ -133,7 +146,7 @@ export default function ChatPanel({
           <Textarea
             ref={inputRef}
             value={input}
-            onChange={handleInputChange}
+            onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask a question about your data..."
             className="min-h-[44px] max-h-[120px] resize-none"
