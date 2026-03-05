@@ -88,6 +88,7 @@ export default function WorkspaceSettingsPage() {
             <SelectContent>
               <SelectItem value="openai">OpenAI GPT-4o</SelectItem>
               <SelectItem value="anthropic">Anthropic Claude</SelectItem>
+              <SelectItem value="openrouter">OpenRouter Arcee</SelectItem>
             </SelectContent>
           </Select>
 

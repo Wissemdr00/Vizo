@@ -27,7 +27,7 @@ export const agentTools = {
 };
 
 export function getAgentConfig(opts: {
-  provider: "openai" | "anthropic";
+  provider: "openai" | "anthropic" | "openrouter";
   schemas: { name: string; type: string; columns?: { name: string; type: string }[]; tables?: { name: string; columns: { name: string; type: string }[]; estimatedRowCount: number }[] }[];
   workspaceName: string;
   workspaceId?: string;
