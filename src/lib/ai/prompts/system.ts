@@ -3,7 +3,7 @@ import { TOOL_GUIDELINES } from "./tool-guidelines";
 import { SAFETY_RULES } from "./safety-rules";
 
 interface SystemPromptArgs {
-  schemas: { name: string; type: string; columns?: { name: string; type: string }[]; tables?: { name: string; columns: { name: string; type: string }[]; estimatedRowCount: number }[] }[];
+  schemas: { id: string; name: string; type: string; columns?: { name: string; type: string }[]; tables?: { name: string; columns: { name: string; type: string }[]; estimatedRowCount: number }[] }[];
   workspaceName: string;
 }
 
@@ -26,7 +26,8 @@ ${SAFETY_RULES}
 - When answering, cite specific numbers and data points
 - Use tables for structured data comparisons
 - Suggest follow-up analyses when relevant
-- If you need to inspect the data first, use the inspect_schema tool
+- If you need to inspect the data first, use the inspect_schema tool with the dataSourceId shown above
+- Always use the exact dataSourceId from the "Available Data Sources" section when calling tools
 - If a query fails, use analyze_results to understand the error and retry with a corrected approach
 - Always suggest follow-up questions after providing insights
 `;

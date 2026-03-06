@@ -58,6 +58,7 @@ export async function POST(req: Request) {
     .where(eq(dataSources.workspaceId, workspaceId));
 
   const schemas = sources.map((s) => ({
+    id: s.id,
     name: s.name,
     type: s.type,
     ...(s.schema as { columns?: { name: string; type: string }[]; tables?: { name: string; columns: { name: string; type: string }[]; estimatedRowCount: number }[] }),
