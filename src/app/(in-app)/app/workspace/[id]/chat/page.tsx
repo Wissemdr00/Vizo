@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   Trash2,
   PenLine,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -30,6 +31,35 @@ export default function WorkspaceChatPage() {
   const [activeConvId, setActiveConvId] = useState<string | null>(
     searchParams.get("conv")
   );
+  const [loadedMessages, setLoadedMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+
+  // Load messages when active conversation changes
+  useEffect(() => {
+    if (!activeConvId) {
+      setLoadedMessages([]);
+      return;
+    }
+    setMessagesLoading(true);
+    fetch(`/api/app/conversations/${activeConvId}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.messages && Array.isArray(data.messages)) {
+          setLoadedMessages(
+            data.messages
+              .filter((m: { role: string }) => m.role === "user" || m.role === "assistant")
+              .map((m: { role: string; content: string }) => ({
+                role: m.role as "user" | "assistant",
+                content: m.content,
+              }))
+          );
+        } else {
+          setLoadedMessages([]);
+        }
+      })
+      .catch(() => setLoadedMessages([]))
+      .finally(() => setMessagesLoading(false));
+  }, [activeConvId]);
 
   // Create new conversation
   const handleNewConversation = async () => {
@@ -147,11 +177,19 @@ export default function WorkspaceChatPage() {
         {/* Right: Chat + Visualization */}
         <ResizablePanel defaultSize={75}>
           {activeConvId ? (
-            <ChatPanel
-              key={activeConvId}
-              conversationId={activeConvId}
-              workspaceId={workspaceId}
-            />
+            messagesLoading ? (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                Loading conversation...
+              </div>
+            ) : (
+              <ChatPanel
+                key={activeConvId}
+                conversationId={activeConvId}
+                workspaceId={workspaceId}
+                initialMessages={loadedMessages}
+              />
+            )
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground">
               <div className="text-center">

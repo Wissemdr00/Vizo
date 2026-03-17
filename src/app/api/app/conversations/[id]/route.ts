@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import withAuthRequired from "@/lib/auth/withAuthRequired";
 import { db } from "@/db";
 import { conversations } from "@/db/schema/conversations";
+import { messages as messagesTable } from "@/db/schema/messages";
 import { workspaces } from "@/db/schema/workspaces";
-import { eq } from "drizzle-orm";
+import { eq, asc } from "drizzle-orm";
 import { z } from "zod";
 
 // GET — single conversation with messages
@@ -22,7 +23,20 @@ export const GET = withAuthRequired(async (req, { session, params }) => {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  return NextResponse.json(conv);
+  // Load messages for this conversation
+  const msgs = await db
+    .select({
+      id: messagesTable.id,
+      role: messagesTable.role,
+      content: messagesTable.content,
+      meta: messagesTable.meta,
+      createdAt: messagesTable.createdAt,
+    })
+    .from(messagesTable)
+    .where(eq(messagesTable.conversationId, id))
+    .orderBy(asc(messagesTable.createdAt));
+
+  return NextResponse.json({ ...conv, messages: msgs });
 });
 
 // PATCH — rename conversation

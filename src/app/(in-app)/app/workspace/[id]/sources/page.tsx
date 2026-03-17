@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
@@ -387,6 +388,7 @@ function DatabaseConnectForm({
   workspaceId: string;
   onSuccess: () => void;
 }) {
+  const [mode, setMode] = useState<"url" | "fields">("url");
   const [type, setType] = useState<"postgresql" | "mysql">("postgresql");
   const [host, setHost] = useState("");
   const [port, setPort] = useState(type === "postgresql" ? 5432 : 3306);
@@ -395,6 +397,7 @@ function DatabaseConnectForm({
   const [password, setPassword] = useState("");
   const [ssl, setSsl] = useState(true);
   const [name, setName] = useState("");
+  const [dbUrl, setDbUrl] = useState("");
   const [testing, setTesting] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; error?: string; version?: string } | null>(null);
@@ -448,66 +451,125 @@ function DatabaseConnectForm({
     }
   };
 
+  const handleConnectUrl = async () => {
+    if (!dbUrl.trim()) return;
+    setConnecting(true);
+    setTestResult(null);
+    try {
+      const res = await fetch("/api/app/data-sources/connect-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ workspaceId, name: name || undefined, url: dbUrl }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Connection failed");
+      toast.success("Database connected!");
+      onSuccess();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to connect");
+    } finally {
+      setConnecting(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
-      <Tabs value={type} onValueChange={(v) => { setType(v as "postgresql" | "mysql"); setPort(v === "postgresql" ? 5432 : 3306); setTestResult(null); }}>
+      {/* Mode toggle: URL vs Manual */}
+      <Tabs value={mode} onValueChange={(v) => { setMode(v as "url" | "fields"); setTestResult(null); }}>
         <TabsList className="w-full">
-          <TabsTrigger value="postgresql" className="flex-1">PostgreSQL</TabsTrigger>
-          <TabsTrigger value="mysql" className="flex-1">MySQL</TabsTrigger>
+          <TabsTrigger value="url" className="flex-1">Connection URL</TabsTrigger>
+          <TabsTrigger value="fields" className="flex-1">Manual Fields</TabsTrigger>
         </TabsList>
       </Tabs>
 
-      <div className="grid grid-cols-2 gap-3">
-        <div className="col-span-2">
-          <Label>Display Name</Label>
-          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="My Production DB" className="mt-1" />
-        </div>
-        <div>
-          <Label>Host</Label>
-          <Input value={host} onChange={(e) => setHost(e.target.value)} placeholder="db.example.com" className="mt-1" />
-        </div>
-        <div>
-          <Label>Port</Label>
-          <Input type="number" value={port} onChange={(e) => setPort(Number(e.target.value))} className="mt-1" />
-        </div>
-        <div>
-          <Label>Database</Label>
-          <Input value={database} onChange={(e) => setDatabase(e.target.value)} placeholder="mydb" className="mt-1" />
-        </div>
-        <div>
-          <Label>Username</Label>
-          <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="postgres" className="mt-1" />
-        </div>
-        <div className="col-span-2">
-          <Label>Password</Label>
-          <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1" />
-        </div>
-        {type === "postgresql" && (
-          <div className="col-span-2 flex items-center gap-2">
-            <Switch checked={ssl} onCheckedChange={setSsl} />
-            <Label>Use SSL/TLS</Label>
+      {mode === "url" ? (
+        /* URL mode */
+        <div className="space-y-3">
+          <div>
+            <Label>Display Name (optional)</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="My Supabase DB" className="mt-1" />
           </div>
-        )}
-      </div>
-
-      {testResult && (
-        <div className={`rounded-md p-3 text-sm ${testResult.success ? "bg-green-50 text-green-700 dark:bg-green-900/20" : "bg-red-50 text-red-700 dark:bg-red-900/20"}`}>
-          {testResult.success
-            ? `✅ Connected successfully${testResult.version ? ` (${testResult.version})` : ""}`
-            : `❌ ${testResult.error}`}
+          <div>
+            <Label>Database URL</Label>
+            <Textarea
+              value={dbUrl}
+              onChange={(e) => setDbUrl(e.target.value)}
+              placeholder="postgresql://user:password@host:5432/database?sslmode=require"
+              className="mt-1 font-mono text-xs min-h-[80px]"
+              rows={3}
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Supports PostgreSQL and MySQL URLs. Find yours in Supabase → Settings → Database.
+            </p>
+          </div>
+          <Button onClick={handleConnectUrl} disabled={connecting || !dbUrl.trim()} className="w-full">
+            {connecting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Database className="h-4 w-4 mr-2" />}
+            Connect & Import Schema
+          </Button>
         </div>
-      )}
+      ) : (
+        /* Manual fields mode */
+        <>
+          <Tabs value={type} onValueChange={(v) => { setType(v as "postgresql" | "mysql"); setPort(v === "postgresql" ? 5432 : 3306); setTestResult(null); }}>
+            <TabsList className="w-full">
+              <TabsTrigger value="postgresql" className="flex-1">PostgreSQL</TabsTrigger>
+              <TabsTrigger value="mysql" className="flex-1">MySQL</TabsTrigger>
+            </TabsList>
+          </Tabs>
 
-      <div className="flex gap-2">
-        <Button variant="outline" onClick={handleTest} disabled={testing || !host || !database || !username} className="flex-1">
-          {testing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-          Test Connection
-        </Button>
-        <Button onClick={handleConnect} disabled={connecting || !testResult?.success || !host} className="flex-1">
-          {connecting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Database className="h-4 w-4 mr-2" />}
-          Connect & Import Schema
-        </Button>
-      </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="col-span-2">
+              <Label>Display Name</Label>
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="My Production DB" className="mt-1" />
+            </div>
+            <div>
+              <Label>Host</Label>
+              <Input value={host} onChange={(e) => setHost(e.target.value)} placeholder="db.example.com" className="mt-1" />
+            </div>
+            <div>
+              <Label>Port</Label>
+              <Input type="number" value={port} onChange={(e) => setPort(Number(e.target.value))} className="mt-1" />
+            </div>
+            <div>
+              <Label>Database</Label>
+              <Input value={database} onChange={(e) => setDatabase(e.target.value)} placeholder="mydb" className="mt-1" />
+            </div>
+            <div>
+              <Label>Username</Label>
+              <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="postgres" className="mt-1" />
+            </div>
+            <div className="col-span-2">
+              <Label>Password</Label>
+              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1" />
+            </div>
+            {type === "postgresql" && (
+              <div className="col-span-2 flex items-center gap-2">
+                <Switch checked={ssl} onCheckedChange={setSsl} />
+                <Label>Use SSL/TLS</Label>
+              </div>
+            )}
+          </div>
+
+          {testResult && (
+            <div className={`rounded-md p-3 text-sm ${testResult.success ? "bg-green-50 text-green-700 dark:bg-green-900/20" : "bg-red-50 text-red-700 dark:bg-red-900/20"}`}>
+              {testResult.success
+                ? `✅ Connected successfully${testResult.version ? ` (${testResult.version})` : ""}`
+                : `❌ ${testResult.error}`}
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleTest} disabled={testing || !host || !database || !username} className="flex-1">
+              {testing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+              Test Connection
+            </Button>
+            <Button onClick={handleConnect} disabled={connecting || !testResult?.success || !host} className="flex-1">
+              {connecting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Database className="h-4 w-4 mr-2" />}
+              Connect & Import Schema
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

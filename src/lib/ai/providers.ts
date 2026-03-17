@@ -1,5 +1,6 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { createAnthropic } from "@ai-sdk/anthropic";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
 export function getModel(provider: "openai" | "anthropic" | "openrouter" = "openai") {
   if (provider === "anthropic") {
@@ -10,9 +11,8 @@ export function getModel(provider: "openai" | "anthropic" | "openrouter" = "open
   }
 
   if (provider === "openrouter") {
-    const openrouter = createOpenAI({
+    const openrouter = createOpenRouter({
       apiKey: process.env.OPENROUTER_API_KEY,
-      baseURL: "https://openrouter.ai/api/v1",
     });
     return openrouter("meta-llama/llama-3.3-70b-instruct:free");
   }
