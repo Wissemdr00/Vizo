@@ -1,48 +1,64 @@
-# Indie Kit
+# Vizo
 
-Indie Kit is a Next.js boilerplate for building SaaS products with auth, billing, email, and background jobs included.
+Turn data into answers, charts, and reports — fast.
 
-## Features
+Vizo is a Julius.ai-style analytics workspace for data analysts. Connect your datasets or databases, chat with an AI analyst, and get actionable insights with SQL, Python, and visualizations.
 
-- Next.js 16
-- NextAuth authentication
-- Drizzle ORM data access
-- Inngest background jobs
-- React Email templates
-- Fumadocs documentation
-- AI SDK provider integrations
+## What you can do
 
-## Getting Started
+- Chat with your data using SQL + Python tools
+- Connect CSV, Excel, JSON, PostgreSQL, and MySQL
+- Paste a connection URL (Supabase/Neon) or enter fields manually
+- Auto‑introspect schemas and profile tables
+- Generate charts and reports inside the workspace
+- Keep conversation history per workspace
 
-Prerequisites: Node.js and pnpm.
+## Tech stack
 
-1. Clone the repo
-2. Run `pnpm install`
-3. Run `pnpm dev`
-4. Open http://localhost:3000
+- Next.js 16, React, TypeScript
+- Vercel AI SDK v6 (OpenAI, Anthropic, OpenRouter)
+- Drizzle ORM + PostgreSQL (app database)
+- DuckDB + Pyodide for local analytics
+- Tailwind CSS + shadcn/ui
+- Vitest for unit testing
+
+## Quick start
+
+1. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+2. Create `.env` and set required variables (see below).
+3. Start the dev stack:
+   ```bash
+   pnpm dev
+   ```
+
+### Environment variables
+
+```
+DATABASE_URL=
+OPENAI_API_KEY=
+ANTHROPIC_API_KEY=
+OPENROUTER_API_KEY=
+```
 
 ## Scripts
 
-- `pnpm dev` - run the app, Inngest dev server, and email preview
-- `pnpm build` - build the Next.js app
-- `pnpm start` - start the production server
-- `pnpm lint` - run ESLint
-- `pnpm test` - run unit tests with Vitest
-- `pnpm test:watch` - run tests in watch mode
+- `pnpm dev` — Next.js app + Inngest dev server + email preview
+- `pnpm build` — production build
+- `pnpm start` — production server
+- `pnpm lint` — ESLint
+- `pnpm test` — Vitest run
+- `pnpm test:watch` — Vitest watch mode
 
-## Local Services
+## Project structure
 
-When running `pnpm dev`, these services start by default:
+- `src/` — application code
+- `public/` — static assets
+- `db/` — Drizzle schema and migrations
+- `docs/` — docs site (optional)
 
-- Next.js app: http://localhost:3000
-- Inngest dev server: http://localhost:8288
-- Email preview: http://localhost:3001
+---
 
-## Project Structure
-
-- `src/` - application code
-- `docs/` - documentation content
-- `public/` - static assets
-- `scripts/` - repo scripts
-
-
+Built for fast, analyst‑first workflows.

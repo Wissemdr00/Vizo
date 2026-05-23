@@ -48,3 +48,12 @@ next-env.d.ts
 .opencode/
 .mcp.json
 scripts/
+
+# project artifacts (safe to ignore for public repo)
+/_bmad-output/
+/_bmad/
+
+# template modules (ignore if unused)
+/docs/
+/src/content/
+/src/emails/
