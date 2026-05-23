@@ -35,6 +35,13 @@ When running `pnpm dev`, these services start by default:
 - Inngest dev server: http://localhost:8288
 - Email preview: http://localhost:3001
 
+## Project Structure
+
+- `src/` - application code
+- `docs/` - documentation content
+- `public/` - static assets
+- `scripts/` - repo scripts
+
 ## Documentation
 
 For detailed documentation, visit [https://indiekit.pro/app/docs](https://indiekit.pro/app/docs)
