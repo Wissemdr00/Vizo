@@ -27,6 +27,14 @@ Indie Kit is a Next.js boilerplate for building SaaS products with auth, billing
 - `pnpm test` - run unit tests with Vitest
 - `pnpm test:watch` - run tests in watch mode
 
+## Local Services
+
+When running `pnpm dev`, these services start by default:
+
+- Next.js app: http://localhost:3000
+- Inngest dev server: http://localhost:8288
+- Email preview: http://localhost:3001
+
 ## Documentation
 
 For detailed documentation, visit [https://indiekit.pro/app/docs](https://indiekit.pro/app/docs)
