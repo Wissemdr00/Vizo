@@ -14,9 +14,12 @@ Indie Kit is a Next.js boilerplate for building SaaS products with auth, billing
 
 ## Getting Started
 
+Prerequisites: Node.js and pnpm.
+
 1. Clone the repo
 2. Run `pnpm install`
 3. Run `pnpm dev`
+4. Open http://localhost:3000
 
 ## Scripts
 
