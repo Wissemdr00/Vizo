@@ -18,6 +18,15 @@ Indie Kit is a Next.js boilerplate for building SaaS products with auth, billing
 2. Run `pnpm install`
 3. Run `pnpm dev`
 
+## Scripts
+
+- `pnpm dev` - run the app, Inngest dev server, and email preview
+- `pnpm build` - build the Next.js app
+- `pnpm start` - start the production server
+- `pnpm lint` - run ESLint
+- `pnpm test` - run unit tests with Vitest
+- `pnpm test:watch` - run tests in watch mode
+
 ## Documentation
 
 For detailed documentation, visit [https://indiekit.pro/app/docs](https://indiekit.pro/app/docs)
