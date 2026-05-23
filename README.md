@@ -1,10 +1,16 @@
 # Indie Kit
 
-Indie Kit is a NextJS Boilerplate for building SaaS products.
+Indie Kit is a Next.js boilerplate for building SaaS products with auth, billing, email, and background jobs included.
 
 ## Features
 
-- NextJS 15
+- Next.js 16
+- NextAuth authentication
+- Drizzle ORM data access
+- Inngest background jobs
+- React Email templates
+- Fumadocs documentation
+- AI SDK provider integrations
 
 ## Getting Started
 
