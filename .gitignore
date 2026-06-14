@@ -48,7 +48,7 @@ next-env.d.ts
 .opencode/
 .mcp.json
 scripts/
-
+/scripts/
 # project artifacts (safe to ignore for public repo)
 /_bmad-output/
 /_bmad/
